@@ -1,0 +1,122 @@
+import { useState } from 'react';
+import * as pdfjsLib from 'pdfjs-dist/build/pdf';
+import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url';
+
+import FileUploader from '../components/FileUploader';
+import { splitPDF } from '../utils/splitPDF';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
+
+
+export default function Split() {
+  const [file, setFile] = useState(null)
+  const [pageCount, setPageCount] = useState(0)
+  const [thumbnails, setThumbnails] = useState([])
+  const [selectedPages, setSelectedPages] = useState([])
+
+  const handleFilesSelected = (files) => {
+    if (files.length > 0) {
+      const pdfFile = files[0]
+      setFile(pdfFile)
+      setSelectedPages([])
+      renderThumbnails(pdfFile)
+    }
+  }
+
+  const renderThumbnails = async (pdfFile) => {
+    // reset
+    setThumbnails([])
+    setPageCount(0)
+
+    const arrayBuffer = await pdfFile.arrayBuffer()
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
+
+    setPageCount(pdf.numPages)
+    const thumbs = []
+
+    // generate each thumbnail
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i)
+      const viewport = page.getViewport({ scale: 0.2 })
+      const canvas = document.createElement('canvas')
+      canvas.width = viewport.width
+      canvas.height = viewport.height
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise
+      thumbs.push(canvas.toDataURL())
+    }
+
+    setThumbnails(thumbs)
+  }
+
+  const togglePage = (num) => {
+    setSelectedPages((old) =>
+      old.includes(num) ? old.filter((p) => p !== num) : [...old, num]
+    )
+  }
+
+  const handleSplit = async () => {
+    if (!file || selectedPages.length === 0) {
+      return alert('Please select at least one page to split.')
+    }
+    try {
+      const blob = await splitPDF(file, selectedPages)
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(blob)
+      link.download = 'split.pdf'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    } catch (err) {
+      console.error(err)
+      alert('Failed to split PDF.')
+    }
+  }
+
+  return (
+    <div className="flex flex-col items-center p-6">
+      <h1 className="text-3xl font-bold mb-6">Split PDF</h1>
+
+      <FileUploader onFilesSelected={handleFilesSelected} />
+
+      {file && (
+        <>
+          <p className="mt-6 text-gray-300">
+            Click thumbnails below to select pages:
+          </p>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4 px-8 py-8 mt-6 bg-gray-800/80 backdrop-blur-sm rounded-lg">
+            {thumbnails.map((src, idx) => {
+              const pageNum = idx + 1
+              const isSelected = selectedPages.includes(pageNum)
+              return (
+                <div
+                  key={idx}
+                  onClick={() => togglePage(pageNum)}
+                  className={`cursor-pointer rounded-lg border-4 overflow-hidden transition
+                    ${isSelected
+                      ? 'border-blue-400'
+                      : 'border-transparent hover:border-blue-200'}
+                  `}
+                >
+                  <img src={src} alt={`Page ${pageNum}`} className="w-full" />
+                  <p className="text-center text-gray-300 mt-2">
+                    Page {pageNum}
+                  </p>
+                </div>
+              )
+            })}
+          </div>
+
+          {selectedPages.length > 0 && (
+            <button
+              onClick={handleSplit}
+              className="mt-8 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg"
+            >
+              Split Selected Pages
+            </button>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
