@@ -11,6 +11,8 @@ node_modules
 dist
 dist-ssr
 *.local
+codebase-with-context.txt
+
 
 # Editor directories and files
 .vscode/*

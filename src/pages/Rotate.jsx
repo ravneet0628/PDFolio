@@ -1,6 +1,7 @@
 import { useState } from "react";
 import * as pdfjsLib from "pdfjs-dist/build/pdf";
 import pdfjsWorkerUrl from "pdfjs-dist/build/pdf.worker.mjs?url";
+import LoadingSpinner from "../components/LoadingSpinner";
 import { PDFDocument, degrees } from "pdf-lib";
 
 import FileUploader from "../components/FileUploader";
@@ -13,6 +14,8 @@ function Rotate() {
   const [selectedPages, setSelectedPages] = useState([]);
   const [pageCount, setPageCount] = useState(0);
   const [pageRotations, setPageRotations] = useState({}); // only user-applied rotations
+  const [isLoading, setIsLoading] = useState(false); // Add loading state
+  const [isWorking, setIsWorking] = useState(false); // Add loading state
 
   const handleFilesSelected = async (files) => {
     if (files.length > 0) {
@@ -25,6 +28,7 @@ function Rotate() {
   };
 
   const renderThumbnails = async (pdfFile) => {
+    setIsLoading(true);
     setThumbnails([]);
     const arrayBuffer = await pdfFile.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -43,6 +47,7 @@ function Rotate() {
       thumbs.push(canvas.toDataURL());
     }
     setThumbnails(thumbs);
+    setIsLoading(false);
   };
 
   const togglePageSelection = (pageNum) => {
@@ -95,6 +100,8 @@ function Rotate() {
   const handleDownloadRotatedPDF = async () => {
     if (!file) return;
 
+    setIsWorking(true);
+
     const arrayBuffer = await file.arrayBuffer();
     const pdfDoc = await PDFDocument.load(arrayBuffer);
 
@@ -117,6 +124,7 @@ function Rotate() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    setIsWorking(false)
   };
 
   return (
@@ -124,8 +132,15 @@ function Rotate() {
       <h1 className="text-3xl font-bold mb-6">Rotate PDFs</h1>
 
       <FileUploader onFilesSelected={handleFilesSelected} />
+      
+      {/* Show loading spinner when processing thumbnails */}
+      {isLoading && !thumbnails.length && (
+        <div className="mt-8">
+          <LoadingSpinner message="Loading PDF pages..." />
+        </div>
+      )}
 
-      {file && (
+      {file && !isLoading && (
         <>
           {/* Toolbar */}
           <div className="flex flex-wrap gap-2 mt-6 justify-center">
@@ -169,42 +184,43 @@ function Rotate() {
           </div>
 
           {/* Thumbnails */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4 mt-6 px-8 py-8 mt-6 bg-gray-800/80 backdrop-blur-sm rounded-lg">
-            {thumbnails.map((thumb, idx) => {
-              const pageNum = idx + 1;
-              const rotation = pageRotations[pageNum] || 0;
+          <div className="w-auto h-auto px-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 pt-6 px-4 pb-4 mt-4 bg-gray-800/80 backdrop-blur-sm rounded-lg max-h-96 overflow-auto">
+              {thumbnails.map((thumb, idx) => {
+                const pageNum = idx + 1;
+                const rotation = pageRotations[pageNum] || 0;
 
-              return (
-                <div
-                  key={idx}
-                  onClick={() => togglePageSelection(pageNum)}
-                  className={`border-4 rounded-lg overflow-hidden cursor-pointer transition
-                  ${selectedPages.includes(pageNum)
-                    ? "border-blue-400"
-                    : "border-transparent hover:border-blue-200"}`}
-                >
-                  <div className="relative w-full">
-                    <img
-                      src={thumb}
-                      alt={`Page ${pageNum}`}
-                      className="w-full transition-transform duration-300"
-                      style={{
-                        transform: `rotate(${rotation}deg)`,
-                      }}
-                    />
+                return (
+                  <div
+                    key={idx}
+                    onClick={() => togglePageSelection(pageNum)}
+                    className={`border-4 rounded-lg overflow-hidden cursor-pointer transition
+                    ${selectedPages.includes(pageNum)
+                      ? "border-blue-400"
+                      : "border-transparent hover:border-blue-200"}`}
+                  >
+                    <div className="relative w-full">
+                      <img
+                        src={thumb}
+                        alt={`Page ${pageNum}`}
+                        className="w-28 transition-transform duration-300"
+                        style={{
+                          transform: `rotate(${rotation}deg)`,
+                        }}
+                      />
+                    </div>
+                    <p className="text-center text-gray-300 mt-2">Page {pageNum}</p>
                   </div>
-                  <p className="text-center text-gray-300 mt-2">Page {pageNum}</p>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-
           {/* Download Button */}
           <button
             onClick={handleDownloadRotatedPDF}
             className="mt-8 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg"
           >
-            Download Rotated PDF
+            {isWorking ? 'Creating Rotated Pdf' : 'Download Rotated PDF'}
           </button>
         </>
       )}

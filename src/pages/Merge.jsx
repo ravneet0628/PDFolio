@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import FileUploader from '../components/FileUploader';
+import LoadingSpinner from '../components/LoadingSpinner';
 import { mergePDFs } from '../utils/mergePDF';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url';
@@ -39,7 +40,7 @@ function SortableItem({ id, file, thumbnail }) {
       {...listeners}
       className="flex flex-col items-center bg-gray-700 rounded-md p-2 cursor-grab"
     >
-      <img src={thumbnail} alt={file.name} className="w-28 h-auto rounded-md mb-2" />
+      <img src={thumbnail} alt={file.name} className="w-28 rounded-md mb-2" />
       <span className="text-xs text-gray-200 break-all text-center">{file.name}</span>
     </div>
   );
@@ -47,6 +48,8 @@ function SortableItem({ id, file, thumbnail }) {
 
 function Merge() {
   const [files, setFiles] = useState([]);
+  const [isLoading, setIsLoading] = useState(false); // Add loading state
+  const [isWorking, setIsWorking] = useState(false); // Add loading state
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -54,6 +57,8 @@ function Merge() {
   );
 
   const handleFilesSelected = async (uploadedFiles) => {
+    setIsLoading(true); // Start loading
+
     const filesWithThumbnails = await Promise.all(
       uploadedFiles.map(async (file, index) => ({
         id: `${index}-${file.name}`,
@@ -63,6 +68,7 @@ function Merge() {
       }))
     );
     setFiles(filesWithThumbnails);
+    setIsLoading(false); // End loading
   };
 
   const renderThumbnail = async (file) => {
@@ -89,6 +95,8 @@ function Merge() {
 
   const handleMerge = async () => {
     if (files.length === 0) return;
+    setIsWorking(true); // Start loading for merge
+
     const fileList = files.map((f) => f.file);
     const mergedBlob = await mergePDFs(fileList);
     const link = document.createElement('a');
@@ -97,6 +105,7 @@ function Merge() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    setIsWorking(false); // End loading
   };
 
   return (
@@ -105,30 +114,40 @@ function Merge() {
 
       <FileUploader onFilesSelected={handleFilesSelected} />
 
+      {/* Show loading or files */}
+      {isLoading && files.length === 0 && (
+        <div className="mt-8">
+          <LoadingSpinner message="Processing PDF files..." />
+        </div>
+      )}
+
       {files.length > 0 && (
         <>
           <p className="mt-6 text-gray-300">Drag PDFs to reorder:</p>
 
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={files.map(f => f.id)} strategy={horizontalListSortingStrategy}>
-              <div className="flex gap-4 overflow-auto p-4 mt-4 px-8 py-8 mt-6 bg-gray-800/80 backdrop-blur-sm rounded-lg">
-                {files.map((file) => (
-                  <SortableItem
-                    key={file.id}
-                    id={file.id}
-                    file={file.file}
-                    thumbnail={file.thumbnail}
-                  />
-                ))}
+              <div className="w-auto h-auto px-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 pt-6 px-4 pb-4 mt-4 bg-gray-800/80 backdrop-blur-sm rounded-lg max-h-96 overflow-auto">
+                  {files.map((file) => (
+                    <SortableItem
+                      key={file.id}
+                      id={file.id}
+                      file={file.file}
+                      thumbnail={file.thumbnail}
+                    />
+                  ))}
+                </div>
               </div>
             </SortableContext>
           </DndContext>
 
           <button
             onClick={handleMerge}
+            disabled={isLoading}
             className="mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg"
           >
-            Merge PDFs
+            {isWorking ? 'Merging...' : 'Merge PDFs'}
           </button>
         </>
       )}

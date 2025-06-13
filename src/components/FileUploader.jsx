@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import LoadingSpinner from './LoadingSpinner';
 
-function FileUploader({ onFilesSelected }) {
+function FileUploader({ onFilesSelected, isLoading = false, showFileList = false }) {
   const [selectedFiles, setSelectedFiles] = useState([]);
 
   const handleFileChange = (e) => {
@@ -8,6 +9,17 @@ function FileUploader({ onFilesSelected }) {
     setSelectedFiles(files);
     onFilesSelected(files); // pass files to parent (Merge.jsx)
   };
+
+  // Show loading state if processing
+  if (isLoading) {
+    return (
+      <div className="w-full max-w-md mx-auto">
+        <div className="flex flex-col items-center justify-center w-full h-48 p-4 bg-gray-800 border-2 border-dashed border-gray-600 rounded-lg">
+          <LoadingSpinner message="Processing files..." />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-md mx-auto">
@@ -26,7 +38,7 @@ function FileUploader({ onFilesSelected }) {
       </label>
 
       {/* Show uploaded file names */}
-      {selectedFiles.length > 0 && (
+      {showFileList && selectedFiles.length > 0 && (
         <ul className="mt-4 space-y-2">
           {selectedFiles.map((file, idx) => (
             <li key={idx} className="text-gray-300 truncate">
