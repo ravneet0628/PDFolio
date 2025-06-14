@@ -16,6 +16,7 @@ function Rotate() {
   const [pageRotations, setPageRotations] = useState({}); // only user-applied rotations
   const [isLoading, setIsLoading] = useState(false); // Add loading state
   const [isWorking, setIsWorking] = useState(false); // Add loading state
+  const [showuploader, setShowUploader] = useState(true);
 
   const handleFilesSelected = async (files) => {
     if (files.length > 0) {
@@ -48,6 +49,7 @@ function Rotate() {
     }
     setThumbnails(thumbs);
     setIsLoading(false);
+    setShowUploader(false);
   };
 
   const togglePageSelection = (pageNum) => {
@@ -125,13 +127,16 @@ function Rotate() {
     link.click();
     document.body.removeChild(link);
     setIsWorking(false)
+    setShowUploader(true);
   };
 
   return (
     <div className="flex flex-col items-center p-6">
       <h1 className="text-3xl font-bold mb-6">Rotate PDFs</h1>
 
-      <FileUploader onFilesSelected={handleFilesSelected} />
+      {!isLoading && showuploader && (
+        <FileUploader onFilesSelected={handleFilesSelected} />
+      )}
       
       {/* Show loading spinner when processing thumbnails */}
       {isLoading && !thumbnails.length && (

@@ -50,6 +50,7 @@ function Merge() {
   const [files, setFiles] = useState([]);
   const [isLoading, setIsLoading] = useState(false); // Add loading state
   const [isWorking, setIsWorking] = useState(false); // Add loading state
+  const [showuploader, setShowUploader] = useState(true);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -69,6 +70,7 @@ function Merge() {
     );
     setFiles(filesWithThumbnails);
     setIsLoading(false); // End loading
+    setShowUploader(false);
   };
 
   const renderThumbnail = async (file) => {
@@ -106,13 +108,17 @@ function Merge() {
     link.click();
     document.body.removeChild(link);
     setIsWorking(false); // End loading
+    setShowUploader(true);
   };
 
   return (
     <div className="flex flex-col items-center p-6">
       <h1 className="text-3xl font-bold mb-6">Merge PDFs</h1>
 
-      <FileUploader onFilesSelected={handleFilesSelected} />
+      {!isLoading && showuploader && (
+        <FileUploader onFilesSelected={handleFilesSelected} />
+      )}
+
 
       {/* Show loading or files */}
       {isLoading && files.length === 0 && (
