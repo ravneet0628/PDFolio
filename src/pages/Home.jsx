@@ -22,7 +22,7 @@ function Home() {
       tools: [
         { name: "Compress PDF", link: "/compress", comingSoon: false },
         { name: "Password Protect PDF", link: "/password-protect", comingSoon: true },
-        { name: "Add Page Numbers", link: "/add-page-numbers", comingSoon: true },
+        { name: "Add Page Numbers", link: "/page-numbering", comingSoon: false },
         { name: "Add Watermark", link: "/add-watermark", comingSoon: true },
       ],
     },

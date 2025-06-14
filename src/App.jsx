@@ -12,6 +12,7 @@ import PdfToJpg from './pages/PdfToJpg';
 import JpgToPdf from './pages/JpgToPdf';
 import Delete from './pages/Delete';
 import Duplicate from './pages/Duplicate';
+import PageNumbering from './pages/PageNumbering';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
             <Route path="/jpg-to-pdf" element={<JpgToPdf/>}/>
             <Route path="/delete" element={<Delete />} />
             <Route path="/duplicate" element={<Duplicate />} />
+            <Route path="/page-numbering" element={<PageNumbering />} />
           </Routes>
         </main>
         <Footer />
