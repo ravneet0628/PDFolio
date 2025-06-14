@@ -1,6 +1,7 @@
 import { useState } from "react";
 import * as pdfjsLib from "pdfjs-dist/build/pdf";
 import pdfjsWorkerUrl from "pdfjs-dist/build/pdf.worker.mjs?url";
+import LoadingSpinner from "../components/LoadingSpinner";
 import { PDFDocument } from "pdf-lib";
 
 import {
@@ -50,6 +51,9 @@ function Reorder() {
   const [thumbnails, setThumbnails] = useState([]);
   const [pageCount, setPageCount] = useState(0);
   const [order, setOrder] = useState([]);
+  const [isLoading, setIsLoading] = useState(false); // Add loading state
+  const [isWorking, setIsWorking] = useState(false); 
+  const [showuploader, setShowUploader] = useState(true)
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -65,6 +69,7 @@ function Reorder() {
   };
 
   const renderThumbnails = async (pdfFile) => {
+    setIsLoading(true);
     const arrayBuffer = await pdfFile.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
 
@@ -83,6 +88,8 @@ function Reorder() {
 
     setThumbnails(thumbs);
     setOrder(thumbs.map((thumb) => thumb.id));
+    setIsLoading(false);
+    setShowUploader(false)
   };
 
   const handleDragEnd = (event) => {
@@ -112,6 +119,8 @@ function Reorder() {
       newPdf.addPage(copiedPage);
     }
 
+    setIsWorking(true);
+
     const pdfBytes = await newPdf.save();
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
 
@@ -121,21 +130,32 @@ function Reorder() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    setIsWorking(false);
+    setShowUploader(true);
   };
 
   return (
     <div className="flex flex-col items-center p-6">
       <h1 className="text-3xl font-bold mb-6">Reorder PDF Pages</h1>
 
-      <FileUploader onFilesSelected={handleFilesSelected} />
+      {!isLoading && showuploader && (
+        <FileUploader onFilesSelected={handleFilesSelected} />
+      )}
 
-      {file && (
+      {/* Show loading spinner when processing thumbnails */}
+      {isLoading && !thumbnails.length && (
+        <div className="mt-8">
+          <LoadingSpinner message="Loading PDF pages..." />
+        </div>
+      )}
+
+      {file && !isLoading && (
         <>
           <p className="mt-6 text-gray-300">Drag and drop to reorder pages:</p>
 
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={order} strategy={horizontalListSortingStrategy}>
-              <div className="flex gap-4 overflow-auto p-4 mt-4 px-8 py-8 mt-6 bg-gray-800/80 backdrop-blur-sm rounded-lg">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 pt-6 px-4 pb-4 mt-4 bg-gray-800/80 backdrop-blur-sm rounded-lg max-h-96 overflow-auto">
                 {order.map((id) => {
                   const thumb = thumbnails.find((thumb) => thumb.id === id);
                   return (
@@ -155,7 +175,7 @@ function Reorder() {
             onClick={handleDownloadReorderedPDF}
             className="mt-8 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg"
           >
-            Download Reordered PDF
+            {isWorking ? 'Creating Reordered Pdf' : 'Download Reordered PDF'}
           </button>
         </>
       )}
