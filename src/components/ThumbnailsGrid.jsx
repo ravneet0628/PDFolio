@@ -1,4 +1,6 @@
-function ThumbnailsGrid({ thumbnails, selectedPages = [], onPageClick = () => {}, allowSelection = false }) {
+import { useState } from 'react';
+
+function ThumbnailsGrid({ thumbnails, selectedPages = [], onPageClick = () => {}, allowSelection = false, renderPageFooter }) {
     return (
       <div className="w-auto h-auto px-4">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 pt-6 px-4 pb-4 mt-4 bg-gray-800/80 backdrop-blur-sm rounded-lg max-h-96 overflow-auto">
@@ -26,6 +28,11 @@ function ThumbnailsGrid({ thumbnails, selectedPages = [], onPageClick = () => {}
                   }}
                 />
                 <p className="text-center text-gray-300 mt-2">Page {pageNum}</p>
+                {renderPageFooter && (
+                  <div className="flex justify-center mt-2">
+                    {renderPageFooter(pageNum)}
+                  </div>
+                )}
               </div>
             );
           })}
@@ -35,4 +42,3 @@ function ThumbnailsGrid({ thumbnails, selectedPages = [], onPageClick = () => {}
   }
   
   export default ThumbnailsGrid;
-  

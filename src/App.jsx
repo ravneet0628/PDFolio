@@ -11,6 +11,7 @@ import Compress from './pages/Compress';
 import PdfToJpg from './pages/PdfToJpg';
 import JpgToPdf from './pages/JpgToPdf';
 import Delete from './pages/Delete';
+import Duplicate from './pages/Duplicate';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             <Route path="/pdf-to-jpg" element={<PdfToJpg />} />
             <Route path="/jpg-to-pdf" element={<JpgToPdf/>}/>
             <Route path="/delete" element={<Delete />} />
+            <Route path="/duplicate" element={<Duplicate />} />
           </Routes>
         </main>
         <Footer />

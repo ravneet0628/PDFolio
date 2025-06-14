@@ -14,6 +14,7 @@ function Home() {
         { name: "Extract Pages", link: "/extract", comingSoon: false },
         { name: "Rotate Pages", link: "/rotate", comingSoon: false },
         { name: "Delete Pages", link: "/delete", comingSoon: false },
+        { name: "Duplicate Pages", link: "/duplicate", comingSoon: false },
       ],
     },
     {
