@@ -10,6 +10,7 @@ import Extract from './pages/Extract';
 import Compress from './pages/Compress';
 import PdfToJpg from './pages/PdfToJpg';
 import JpgToPdf from './pages/JpgToPdf';
+import Delete from './pages/Delete';
 
 function App() {
   return (
@@ -27,8 +28,7 @@ function App() {
             <Route path="/compress" element={<Compress />} />
             <Route path="/pdf-to-jpg" element={<PdfToJpg />} />
             <Route path="/jpg-to-pdf" element={<JpgToPdf/>}/>
-
-
+            <Route path="/delete" element={<Delete />} />
           </Routes>
         </main>
         <Footer />

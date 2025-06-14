@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 codebase-with-context.txt
+docs
+
 
 
 # Editor directories and files
