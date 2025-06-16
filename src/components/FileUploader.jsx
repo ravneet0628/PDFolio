@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import LoadingSpinner from './LoadingSpinner';
 
-function FileUploader({ onFilesSelected, isLoading = false, showFileList = false }) {
+function FileUploader({ onFilesSelected, isLoading = false, showFileList = false, showUI = true }) {
   const [selectedFiles, setSelectedFiles] = useState([]);
 
   const handleFileChange = (e) => {
@@ -23,6 +23,7 @@ function FileUploader({ onFilesSelected, isLoading = false, showFileList = false
 
   return (
     <div className="w-full max-w-md mx-auto">
+      {showUI && (
       <label className="flex flex-col items-center justify-center w-full h-48 p-4 text-gray-800 bg-gray-200 dark:text-gray-400 dark:bg-gray-800 border-2 border-dashed rounded-lg cursor-pointer hover:border-blue-400 hover:text-blue-400">
         <input
           type="file"
@@ -36,6 +37,7 @@ function FileUploader({ onFilesSelected, isLoading = false, showFileList = false
           <span className="text-sm text-gray-500">(Only PDFs allowed)</span>
         </p>
       </label>
+      )}
 
       {/* Show uploaded file names */}
       {showFileList && selectedFiles.length > 0 && (

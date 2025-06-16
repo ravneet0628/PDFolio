@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url';
-
+import LoadingSpinner from '../components/LoadingSpinner';
 import FileUploader from '../components/FileUploader';
 import { splitPDF } from '../utils/splitPDF';
 
@@ -27,25 +27,35 @@ export default function Split() {
   }
 
   const renderThumbnails = async (pdfFile) => {
-    setIsLoading(true);
-    setThumbnails([]);
-    setPageCount(0);
-    const arrayBuffer = await pdfFile.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-    setPageCount(pdf.numPages);
-    const thumbs = [];
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const viewport = page.getViewport({ scale: 0.2 });
-      const canvas = document.createElement('canvas');
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
-      await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-      thumbs.push(canvas.toDataURL());
+    try {
+      setIsLoading(true);
+      setThumbnails([]);
+      setPageCount(0);
+      const arrayBuffer = await pdfFile.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      setPageCount(pdf.numPages);
+      const thumbs = [];
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const viewport = page.getViewport({ scale: 0.2 });
+        const canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+        thumbs.push(canvas.toDataURL());
+      }
+      setThumbnails(thumbs);
+      setIsLoading(false);
+      setShowUploader(false);
+    } catch (err) {
+      setIsLoading(false);
+      setShowUploader(true);
+      setFile(null);
+      setThumbnails([]);
+      setPageCount(0);
+      alert('Failed to load PDF. Please try another file.');
+      console.error('Error rendering thumbnails:', err);
     }
-    setThumbnails(thumbs);
-    setIsLoading(false);
-    setShowUploader(false);
   }
 
   const togglePage = (num) => {
