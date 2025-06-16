@@ -1,14 +1,21 @@
 import { useState } from "react";
 import FileUploader from "../components/FileUploader";
 import { PDFDocument } from "pdf-lib";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 function Compress() {
   const [file, setFile] = useState(null);
   const [isCompressing, setIsCompressing] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isWorking, setIsWorking] = useState(false);
+  const [showUploader, setShowUploader] = useState(true);
 
   const handleFilesSelected = async (files) => {
-    if (files.length > 0) setFile(files[0]);
+    if (files.length > 0) {
+      setFile(files[0]);
+      setShowUploader(false);
+    }
   };
 
   const compressPDF = async () => {
@@ -38,9 +45,16 @@ function Compress() {
   };
 
   return (
-    <div className="flex flex-col items-center p-6">
-      <h1 className="text-3xl font-bold mb-6">Compress PDF</h1>
-      <FileUploader onFilesSelected={handleFilesSelected} />
+    <div className="flex flex-col items-center p-6 bg-white dark:bg-gray-950 min-h-screen transition-colors">
+      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">Compress PDF</h1>
+      {!isLoading && showUploader && (
+        <FileUploader onFilesSelected={handleFilesSelected} />
+      )}
+      {isLoading && (
+        <div className="mt-8">
+          <LoadingSpinner message="Loading..." />
+        </div>
+      )}
 
       {isCompressing && (
         <div className="w-full max-w-md mt-6">

@@ -52,15 +52,20 @@ function SortableImage({ file, index, id, onDelete, isOver, isDragging }) {
 
 function JpgToPdf() {
   const [files, setFiles] = useState([]);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // for file/image loading
+  const [isWorking, setIsWorking] = useState(false); // for PDF generation
+  const [showUploader, setShowUploader] = useState(true);
 
   const sensors = useSensors(useSensor(PointerSensor));
 
   const handleFilesSelected = (newFiles) => {
+    setIsLoading(true);
     const updatedFiles = [...files, ...Array.from(newFiles)];
     const uniqueFiles = Array.from(new Set(updatedFiles.map(f => f.name)))
       .map(name => updatedFiles.find(f => f.name === name));
     setFiles(uniqueFiles);
+    setIsLoading(false);
+    setShowUploader(false);
   };
 
   const handleDragEnd = (event) => {
@@ -78,9 +83,8 @@ function JpgToPdf() {
 
   const generatePdf = async () => {
     if (files.length === 0) return;
-    setIsGenerating(true);
+    setIsWorking(true);
     const pdfDoc = await PDFDocument.create();
-
     for (const file of files) {
       const imageBytes = await file.arrayBuffer();
       const ext = file.type.includes("png") ? "png" : "jpg";
@@ -89,7 +93,6 @@ function JpgToPdf() {
       const page = pdfDoc.addPage([dims.width, dims.height]);
       page.drawImage(image, { x: 0, y: 0, width: dims.width, height: dims.height });
     }
-
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
     const link = document.createElement("a");
@@ -98,17 +101,37 @@ function JpgToPdf() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    setIsGenerating(false);
+    setIsWorking(false);
   };
 
   return (
-    <div className="flex flex-col items-center p-6">
-      <h1 className="text-3xl font-bold mb-6">JPG to PDF</h1>
-      <FileUploader onFilesSelected={handleFilesSelected} multiple accept="image/*" />
+    <div className="flex flex-col items-center p-6 min-h-screen bg-white dark:bg-gray-900 transition-colors">
+      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">JPG to PDF</h1>
+      {showUploader && (
+        <FileUploader onFilesSelected={handleFilesSelected} multiple accept="image/*" />
+      )}
 
-      {files.length > 0 && (
+      {isLoading && (
+        <div className="w-full max-w-md mt-6 animate-pulse">
+          <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded overflow-hidden">
+            <div className="h-4 bg-cyan-600 dark:bg-cyan-400 animate-pulse w-full"></div>
+          </div>
+          <p className="text-center text-gray-500 dark:text-gray-400 text-sm mt-1">Loading images...</p>
+        </div>
+      )}
+
+      {isWorking && (
+        <div className="w-full max-w-md mt-6 animate-pulse">
+          <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded overflow-hidden">
+            <div className="h-4 bg-green-600 dark:bg-green-400 animate-pulse w-full"></div>
+          </div>
+          <p className="text-center text-gray-500 dark:text-gray-400 text-sm mt-1">Generating PDF...</p>
+        </div>
+      )}
+
+      {files.length > 0 && !isLoading && !isWorking && (
         <>
-          <div className="w-full bg-gray-800/80 backdrop-blur-sm rounded-lg px-6 py-6 mt-6">
+          <div className="w-full bg-gray-100 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg px-6 py-6 mt-6">
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <SortableContext items={files.map((f) => f.name)} strategy={rectSortingStrategy}>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -128,10 +151,10 @@ function JpgToPdf() {
 
           <button
             onClick={generatePdf}
-            disabled={isGenerating}
-            className="mt-6 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg disabled:opacity-50"
+            disabled={isWorking}
+            className="mt-6 bg-green-600 dark:bg-green-700 hover:bg-green-700 dark:hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg disabled:opacity-50"
           >
-            {isGenerating ? "Generating PDF..." : "Download PDF"}
+            {isWorking ? "Generating PDF..." : "Download PDF"}
           </button>
         </>
       )}

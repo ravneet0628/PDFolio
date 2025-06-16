@@ -15,9 +15,9 @@ function Extract() {
   const [thumbnails, setThumbnails] = useState([]);
   const [selectedPages, setSelectedPages] = useState([]);
   const [pageCount, setPageCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(false); // Add loading state
-  const [isWorking, setIsWorking] = useState(false); // Add loading state
-  const [showuploader, setShowUploader] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isWorking, setIsWorking] = useState(false);
+  const [showUploader, setShowUploader] = useState(true);
 
   const handleFilesSelected = async (files) => {
     if (files.length > 0) {
@@ -35,9 +35,7 @@ function Extract() {
     setThumbnails([]);
     const arrayBuffer = await pdfFile.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-
     setPageCount(pdf.numPages);
-
     const thumbs = [];
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
@@ -115,17 +113,16 @@ function Extract() {
   };
 
   return (
-    <div className="flex flex-col items-center p-6">
-      <h1 className="text-3xl font-bold mb-6">Extract PDF Pages</h1>
+    <div className="flex flex-col items-center p-6 bg-white dark:bg-gray-950 min-h-screen transition-colors">
+      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">Extract PDF Pages</h1>
 
-      {!isLoading && showuploader && (
+      {!isLoading && showUploader && (
         <FileUploader onFilesSelected={handleFilesSelected} />
       )}
 
-      {/* Show loading spinner when processing thumbnails */}
-      {isLoading && !thumbnails.length && (
+      {isLoading && (
         <div className="mt-8">
-          <LoadingSpinner message="Loading PDF pages..." />
+          <LoadingSpinner message="Loading PDF..." />
         </div>
       )}
 

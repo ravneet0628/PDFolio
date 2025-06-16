@@ -26,31 +26,29 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 
 function SortableItem({ id, file, thumbnail }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
-
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
-
   return (
     <div
       ref={setNodeRef}
       style={style}
       {...attributes}
       {...listeners}
-      className="flex flex-col items-center bg-gray-700 rounded-md p-2 cursor-grab"
+      className="flex flex-col items-center bg-gray-100 dark:bg-gray-700 rounded-md p-2 cursor-grab"
     >
       <img src={thumbnail} alt={file.name} className="w-28 rounded-md mb-2" />
-      <span className="text-xs text-gray-200 break-all text-center">{file.name}</span>
+      <span className="text-xs text-gray-700 dark:text-gray-200 break-all text-center">{file.name}</span>
     </div>
   );
 }
 
 function Merge() {
   const [files, setFiles] = useState([]);
-  const [isLoading, setIsLoading] = useState(false); // Add loading state
-  const [isWorking, setIsWorking] = useState(false); // Add loading state
-  const [showuploader, setShowUploader] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isWorking, setIsWorking] = useState(false);
+  const [showUploader, setShowUploader] = useState(true);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -58,8 +56,7 @@ function Merge() {
   );
 
   const handleFilesSelected = async (uploadedFiles) => {
-    setIsLoading(true); // Start loading
-
+    setIsLoading(true);
     const filesWithThumbnails = await Promise.all(
       uploadedFiles.map(async (file, index) => ({
         id: `${index}-${file.name}`,
@@ -69,7 +66,7 @@ function Merge() {
       }))
     );
     setFiles(filesWithThumbnails);
-    setIsLoading(false); // End loading
+    setIsLoading(false);
     setShowUploader(false);
   };
 
@@ -97,8 +94,7 @@ function Merge() {
 
   const handleMerge = async () => {
     if (files.length === 0) return;
-    setIsWorking(true); // Start loading for merge
-
+    setIsWorking(true);
     const fileList = files.map((f) => f.file);
     const mergedBlob = await mergePDFs(fileList);
     const link = document.createElement('a');
@@ -107,34 +103,28 @@ function Merge() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    setIsWorking(false); // End loading
+    setIsWorking(false);
     setShowUploader(true);
   };
 
   return (
-    <div className="flex flex-col items-center p-6">
-      <h1 className="text-3xl font-bold mb-6">Merge PDFs</h1>
-
-      {!isLoading && showuploader && (
+    <div className="flex flex-col items-center p-6 bg-white dark:bg-gray-950 min-h-screen transition-colors">
+      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">Merge PDFs</h1>
+      {!isLoading && showUploader && (
         <FileUploader onFilesSelected={handleFilesSelected} />
       )}
-
-
-      {/* Show loading or files */}
       {isLoading && files.length === 0 && (
         <div className="mt-8">
           <LoadingSpinner message="Processing PDF files..." />
         </div>
       )}
-
       {files.length > 0 && (
         <>
-          <p className="mt-6 text-gray-300">Drag PDFs to reorder:</p>
-
+          <p className="mt-6 text-gray-700 dark:text-gray-300">Drag PDFs to reorder:</p>
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={files.map(f => f.id)} strategy={horizontalListSortingStrategy}>
               <div className="w-auto h-auto px-4">
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 pt-6 px-4 pb-4 mt-4 bg-gray-800/80 backdrop-blur-sm rounded-lg max-h-96 overflow-auto">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 pt-6 px-4 pb-4 mt-4 bg-gray-100 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg max-h-96 overflow-auto">
                   {files.map((file) => (
                     <SortableItem
                       key={file.id}
@@ -147,7 +137,6 @@ function Merge() {
               </div>
             </SortableContext>
           </DndContext>
-
           <button
             onClick={handleMerge}
             disabled={isLoading}
