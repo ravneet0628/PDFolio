@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Hide number input arrows for all browsers */
 .hide-number-arrows::-webkit-outer-spin-button,
 .hide-number-arrows::-webkit-inner-spin-button {

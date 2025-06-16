@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ThemeProvider } from './components/ThemeContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -16,28 +17,30 @@ import PageNumbering from './pages/PageNumbering';
 
 function App() {
   return (
-    <Router>
-      <div className="flex flex-col min-h-screen bg-gray-900 text-white">
-        <Navbar />
-        <main className="flex-grow p-8">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/merge" element={<Merge />} />
-            <Route path="/split" element={<Split />} />
-            <Route path="/rotate" element={<Rotate />} />
-            <Route path="/reorder" element={<Reorder />} />
-            <Route path="/extract" element={<Extract />} />
-            <Route path="/compress" element={<Compress />} />
-            <Route path="/pdf-to-jpg" element={<PdfToJpg />} />
-            <Route path="/jpg-to-pdf" element={<JpgToPdf/>}/>
-            <Route path="/delete" element={<Delete />} />
-            <Route path="/duplicate" element={<Duplicate />} />
-            <Route path="/page-numbering" element={<PageNumbering />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <div className="flex flex-col min-h-screen bg-gray-50 text-black dark:bg-gray-950 dark:text-white">
+          <Navbar />
+          <main className="flex-grow p-8">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/merge" element={<Merge />} />
+              <Route path="/split" element={<Split />} />
+              <Route path="/rotate" element={<Rotate />} />
+              <Route path="/reorder" element={<Reorder />} />
+              <Route path="/extract" element={<Extract />} />
+              <Route path="/compress" element={<Compress />} />
+              <Route path="/pdf-to-jpg" element={<PdfToJpg />} />
+              <Route path="/jpg-to-pdf" element={<JpgToPdf/>}/>
+              <Route path="/delete" element={<Delete />} />
+              <Route path="/duplicate" element={<Duplicate />} />
+              <Route path="/page-numbering" element={<PageNumbering />} />
+            </Routes>
+          </main>
+          <Footer />
+        </div>
+      </Router>
+    </ThemeProvider>
   );
 }
 
