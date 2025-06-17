@@ -3,7 +3,7 @@ import { useState } from 'react';
 function ThumbnailsGrid({ thumbnails, selectedPages = [], onPageClick = () => {}, allowSelection = false, renderPageFooter }) {
     return (
       <div className="w-auto h-auto px-4">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 pt-6 px-4 pb-4 mt-4 bg-white dark:bg-gray-900/80 backdrop-blur-sm rounded-lg max-h-96 overflow-auto transition-colors">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 pt-6 px-4 pb-4 mt-4 bg-gray-200/50 dark:bg-gray-800 backdrop-blur-sm rounded-lg max-h-96 overflow-auto transition-colors">
           {thumbnails.map((thumb, idx) => {
             const pageNum = idx + 1;
             const isSelected = selectedPages.includes(pageNum);
@@ -15,8 +15,8 @@ function ThumbnailsGrid({ thumbnails, selectedPages = [], onPageClick = () => {}
                 className={`border-4 rounded-lg overflow-hidden cursor-pointer transition 
                   ${allowSelection
                     ? isSelected
-                      ? "border-cyan-700 dark:border-cyan-400"
-                      : "border-transparent hover:border-cyan-600 dark:hover:border-cyan-400"
+                      ? "border-cyan-700 dark:border-cyan-400 hover:shadow-lg shadow-cyan-200 dark:shadow-cyan-800"
+                      : "border-transparent hover:border-gray-400 dark:hover:border-gray-400 hover:shadow-lg dark:hover:shadow-gray-700"
                     : "border-transparent"}`}
               >
                 <img

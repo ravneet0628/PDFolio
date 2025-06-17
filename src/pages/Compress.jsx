@@ -7,13 +7,16 @@ function Compress() {
   const [file, setFile] = useState(null);
   const [isWorking, setIsWorking] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showUploader, setShowUploader] = useState(true);
+  const [showDownloadbutton, setShowDownloadbutton] = useState(false);
+  const [showUI, setshowUI] = useState(true);
+  const [showFileList, setShowFileList] = useState(false);
 
   const handleFilesSelected = async (files) => {
     if (files.length > 0) {
       setFile(files[0]);
-      
+      setshowUI(false);
+      setShowDownloadbutton(true);
+      setShowFileList(true);
     }
   };
 
@@ -41,36 +44,33 @@ function Compress() {
     document.body.removeChild(link);
 
     setIsWorking(false);
+    setShowDownloadbutton(false);
+    setshowUI(true);
+    setShowFileList(false);
   };
 
   return (
     <div className="flex flex-col items-center p-6 bg-white dark:bg-gray-950 min-h-screen transition-colors">
       <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">Compress PDF</h1>
-      {!isLoading && (
-        <FileUploader onFilesSelected={handleFilesSelected} showFileList={true} showUI= {false} />
-      )}
-      {isLoading && (
-        <div className="mt-8">
-          <LoadingSpinner message="Loading..." />
-        </div>
+      {!isWorking && (
+        <FileUploader onFilesSelected={handleFilesSelected} showFileList={showFileList} showUI={showUI}/>
       )}
 
       {isWorking && (
         <div className="w-full max-w-md mt-6">
-          <div className="h-4 bg-gray-700 rounded overflow-hidden">
-            <div className="h-4 bg-cyan-600 transition-all duration-300" style={{ width: `${progress}%` }}></div>
-          </div>
-          <p className="text-center text-gray-400 text-sm mt-1">{progress}%</p>
+          <LoadingSpinner message="Compressing..." />
         </div>
       )}
 
+      {showDownloadbutton && (
       <button
         onClick={compressPDF}
         disabled={isWorking || !file}
         className="mt-8 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg disabled:opacity-50"
       >
-        {isWorking ? "Compressing..." : "Download Compressed PDF"}
+        Download Compressed PDF
       </button>
+      )}
     </div>
   );
 }

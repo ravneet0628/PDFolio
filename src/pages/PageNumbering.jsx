@@ -166,19 +166,19 @@ function PageNumbering() {
       )}
       {file && !isLoading && (
         <>
-          <div className="w-full max-w-2xl mx-auto bg-gray-800 rounded-lg p-4 mb-6 mt-4">
+          <div className="w-full max-w-2xl mx-auto bg-gray-200/50 dark:bg-gray-800 rounded-lg p-4 mb-6 mt-4">
             <div className="flex flex-wrap gap-4 items-center justify-center">
-              <label className="flex flex-col items-center text-gray-200">
+              <label className="flex flex-col items-center texy=gray-800 dark:text-gray-200">
                 Start Number
                 <input
                   type="number"
                   min={1}
                   value={startNumber}
                   onChange={e => setStartNumber(Number(e.target.value))}
-                  className="w-20 text-center rounded bg-gray-900 text-white border border-gray-600 text-sm py-1 mt-1"
+                  className="w-20 text-center rounded inset-shadow-sm bg-gray-300/50 dark:bg-gray-900 texy=gray-800 dark:text-gray-200 text-sm py-1 mt-1"
                 />
               </label>
-              <label className="flex flex-col items-center text-gray-200">
+              <label className="flex flex-col items-center texy=gray-800 dark:text-gray-200">
                 Font Size
                 <input
                   type="number"
@@ -186,37 +186,37 @@ function PageNumbering() {
                   max={48}
                   value={fontSize}
                   onChange={e => setFontSize(Number(e.target.value))}
-                  className="w-20 text-center rounded bg-gray-900 text-white border border-gray-600 text-sm py-1 mt-1"
+                  className="w-20 text-center rounded inset-shadow-sm bg-gray-300/50 dark:bg-gray-900 texy=gray-800 dark:text-gray-200 text-sm py-1 mt-1"
                 />
               </label>
-              <label className="flex flex-col items-center text-gray-200">
+              <label className="flex flex-col items-center texy=gray-800 dark:text-gray-200">
                 Color
                 <input
                   type="color"
                   value={color}
                   onChange={e => setColor(e.target.value)}
-                  className="w-8 h-8 p-0 border-2 border-gray-600 rounded mt-1"
+                  className="w-8 h-8 p-0 border-1 border-gray-600 rounded"
                   style={{ minWidth: '2rem', minHeight: '2rem' }}
                 />
               </label>
-              <label className="flex flex-col items-center text-gray-200">
+              <label className="flex flex-col items-center texy=gray-800 dark:text-gray-200">
                 Position
                 <select
                   value={position}
                   onChange={e => setPosition(e.target.value)}
-                  className="rounded bg-gray-900 text-white border border-gray-600 text-sm py-1 mt-1"
+                  className="w-full text-center rounded inset-shadow-sm bg-gray-300/50 dark:bg-gray-900 texy=gray-800 dark:text-gray-200 text-sm py-1 mt-1"
                 >
                   {positions.map(opt => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
                   ))}
                 </select>
               </label>
-              <label className="flex flex-col items-center text-gray-200">
+              <label className="flex flex-col items-center texy=gray-800 dark:text-gray-200">
                 Style
                 <select
                   value={style}
                   onChange={e => setStyle(e.target.value)}
-                  className="rounded bg-gray-900 text-white border border-gray-600 text-sm py-1 mt-1"
+                  className="w-20 text-center rounded inset-shadow-sm bg-gray-300/50 dark:bg-gray-900 texy=gray-800 dark:text-gray-200 text-sm py-1 mt-1"
                 >
                   {numberStyles.map(opt => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>

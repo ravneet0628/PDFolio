@@ -24,7 +24,7 @@ function FileUploader({ onFilesSelected, isLoading = false, showFileList = false
   return (
     <div className="w-full max-w-md mx-auto">
       {showUI && (
-      <label className="flex flex-col items-center justify-center w-full h-48 p-4 text-gray-800 bg-gray-200 dark:text-gray-400 dark:bg-gray-800 border-2 border-dashed rounded-lg cursor-pointer hover:border-blue-400 hover:text-blue-400">
+      <label className="flex flex-col items-center shadow-md justify-center w-full h-48 p-4 text-gray-950 bg-gray-200/50 dark:text-gray-400 dark:bg-gray-800 rounded-lg cursor-pointer hover:shadow-gray-400/50 hover:text-blue-400">
         <input
           type="file"
           multiple
@@ -41,14 +41,24 @@ function FileUploader({ onFilesSelected, isLoading = false, showFileList = false
 
       {/* Show uploaded file names */}
       {showFileList && selectedFiles.length > 0 && (
-        <ul className="mt-4 space-y-2">
-          {selectedFiles.map((file, idx) => (
-            <li key={idx} className="text-gray-300 truncate">
-              📄 {file.name}
-            </li>
-          ))}
-        </ul>
+        <div className="mt-4 p-4 bg-gray-100 inset-shadow-sm dark:bg-gray-800 rounded-lg">
+        <h3 className="text-lg font-semibold text-gray-950 dark:text-gray-200">Selected Files</h3>
+         
+        {selectedFiles.length === 0 ? (
+          <p className="mt-2 text-gray-950 dark:text-gray-200">No files selected.</p>
+        ) : (
+          <ul className="mt-2 space-y-2">
+            {selectedFiles.map((file, idx) => (
+              <li key={idx} className="text-gray-800 dark:text-gray-300 truncate">
+                <span role="img" aria-label="PDF">📄</span> {file.name} ({(file.size / 1024).toFixed  (
+                2)} KB)
+              </li>
+            ))}
+          </ul>
+        )}
+        </div>
       )}
+      
     </div>
   );
 }
