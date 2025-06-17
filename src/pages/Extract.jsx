@@ -4,8 +4,6 @@ import pdfjsWorkerUrl from "pdfjs-dist/build/pdf.worker.mjs?url";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { PDFDocument } from "pdf-lib";
 import ThumbnailsGrid from "../components/ThumbnailsGrid";
-
-
 import FileUploader from "../components/FileUploader";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
