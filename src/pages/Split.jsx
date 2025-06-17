@@ -154,42 +154,12 @@ export default function Split() {
             Click thumbnails below to select split points:
           </p>
 
-          <div className="relative w-full">
-            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4 px-8 py-8 mt-6 bg-gray-100 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg">
-              {thumbnails.map((src, idx) => {
-                const pageNum = idx + 1;
-                const isSelected = selectedPages.includes(pageNum);
-                // Determine if a split bar should be shown after this page
-                const showSplitBar = selectedPages.includes(pageNum);
-                return (
-                  <div key={idx} className="relative flex flex-col items-center">
-                    <div
-                      onClick={() => togglePage(pageNum)}
-                      className={`cursor-pointer rounded-lg border-4 overflow-hidden transition w-full
-                        ${isSelected
-                          ? 'border-cyan-700 dark:border-cyan-400'
-                          : 'border-transparent hover:border-cyan-600 dark:hover:border-cyan-400'}
-                      `}
-                    >
-                      <img src={src} alt={`Page ${pageNum}`} className="w-full bg-white dark:bg-gray-900" />
-                      <p className="text-center text-gray-700 dark:text-gray-200 mt-2">
-                        Page {pageNum}
-                      </p>
-                    </div>
-                    {/* Split bar indicator */}
-                    {showSplitBar && idx !== thumbnails.length - 1 && (
-                      <div className="w-full flex justify-center -mb-2">
-                        <div className="h-6 w-1 bg-cyan-500 dark:bg-cyan-400 rounded-full shadow-lg animate-pulse flex items-center justify-center relative z-10">
-                          <span className="absolute -left-6 text-xs text-cyan-700 dark:text-cyan-300 font-bold select-none">Split</span>
-                          <svg className="w-4 h-4 absolute -right-5 top-1/2 -translate-y-1/2 text-cyan-700 dark:text-cyan-300" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l-6 6m0 0l6 6m-6-6h18" /></svg>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          <ThumbnailsGrid
+            thumbnails={thumbnails}
+            splitPoints={selectedPages}
+            onPageClick={togglePage}
+            allowSplitSelection={true}
+          />
 
           {/* Multi-split download buttons */}
           {selectedPages.length > 0 && (
