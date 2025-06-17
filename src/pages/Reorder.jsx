@@ -36,10 +36,19 @@ function SortableThumbnail({ id, thumb, pageNum }) {
       {...attributes}
       {...listeners}
       style={style}
-      className="flex flex-col items-center bg-gray-100 dark:bg-gray-700 rounded-md p-2 cursor-grab"
+      className="flex flex-col 
+      items-center bg-gray-200/50 dark:bg-gray-800 
+      backdrop-blur-sm rounded-lg p-2 cursor-grab 
+      border-transparent hover:border-gray-400 
+      dark:hover:border-gray-400 hover:shadow-lg 
+      dark:hover:shadow-gray-700"
     >
-      <img src={thumb} alt={`Page ${pageNum}`} className="w-28 h-auto rounded-md mb-2" />
-      <span className="text-xs text-gray-700 dark:text-gray-200">Page {pageNum}</span>
+      <div>
+        <img src={thumb} alt={`Page ${pageNum}`} className="w-28 rounded-md mb-2 rounded-md transition-transform duration-300 bg-white dark:bg-gray-800" />
+      </div>
+      <div>  
+        <span className=" text-xs text-gray-900 dark:text-gray-200">Page {pageNum}</span>
+      </div>
     </div>
   );
 }
