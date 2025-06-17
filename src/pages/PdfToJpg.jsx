@@ -3,6 +3,7 @@ import FileUploader from "../components/FileUploader";
 import * as pdfjsLib from "pdfjs-dist/build/pdf";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
 import JSZip from "jszip";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
@@ -106,20 +107,13 @@ function PdfToJpg() {
       )}
 
       {isLoading && (
-        <div className="w-full max-w-md mt-6 animate-pulse">
-          <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded overflow-hidden">
-            <div className="h-4 bg-cyan-600 dark:bg-cyan-400 animate-pulse w-full"></div>
-          </div>
-          <p className="text-center text-gray-500 dark:text-gray-400 text-sm mt-1">Rendering pages...</p>
+        <div className="w-full max-w-md mt-6">
+          <LoadingSpinner message="Rendering pages..." />
         </div>
       )}
-
       {isWorking && (
-        <div className="w-full max-w-md mt-6 animate-pulse">
-          <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded overflow-hidden">
-            <div className="h-4 bg-blue-600 dark:bg-blue-400 animate-pulse w-full"></div>
-          </div>
-          <p className="text-center text-gray-500 dark:text-gray-400 text-sm mt-1">Preparing ZIP...</p>
+        <div className="w-full max-w-md mt-6">
+          <LoadingSpinner message="Preparing ZIP..." />
         </div>
       )}
 

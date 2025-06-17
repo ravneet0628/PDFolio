@@ -1,25 +1,22 @@
 import { useState } from 'react';
-import LoadingSpinner from './LoadingSpinner';
 
-function FileUploader({ onFilesSelected, isLoading = false, showFileList = false, showUI = true }) {
+function FileUploader({ onFilesSelected, accept= "application/pdf", showFileList = false, showUI = true }) {
   const [selectedFiles, setSelectedFiles] = useState([]);
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     setSelectedFiles(files);
-    onFilesSelected(files); // pass files to parent (Merge.jsx)
+    onFilesSelected(files);
   };
 
-  // Show loading state if processing
-  if (isLoading) {
-    return (
-      <div className="w-full max-w-md mx-auto">
-        <div className="flex flex-col items-center justify-center w-full h-48 p-4 bg-gray-800 border-2 border-dashed border-gray-600 rounded-lg">
-          <LoadingSpinner message="Processing files..." />
-        </div>
-      </div>
-    );
-  }
+  const isImage = accept.startsWith('image/');
+  const icon = isImage ? '🖼️' : '📄';
+
+  const readableAccept = (accept) => {
+    if (accept === 'application/pdf') return 'PDF';
+    if (accept.startsWith('image/')) return 'Images';
+    return accept;
+  };
 
   return (
     <div className="w-full max-w-md mx-auto">
@@ -28,13 +25,13 @@ function FileUploader({ onFilesSelected, isLoading = false, showFileList = false
         <input
           type="file"
           multiple
-          accept="application/pdf"
+          accept={accept}
           onChange={handleFileChange}
           className="hidden"
         />
         <p className="text-center">
           Click to upload<br />
-          <span className="text-sm text-gray-500">(Only PDFs allowed)</span>
+          <span className="text-sm text-gray-500">(Only {readableAccept(accept)} allowed)</span>
         </p>
       </label>
       )}
@@ -50,7 +47,7 @@ function FileUploader({ onFilesSelected, isLoading = false, showFileList = false
           <ul className="mt-2 space-y-2">
             {selectedFiles.map((file, idx) => (
               <li key={idx} className="text-gray-800 dark:text-gray-300 truncate">
-                <span role="img" aria-label="PDF">📄</span> {file.name} ({(file.size / 1024).toFixed  (
+                {icon} {file.name} ({(file.size / 1024).toFixed  (
                 2)} KB)
               </li>
             ))}

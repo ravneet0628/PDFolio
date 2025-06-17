@@ -36,7 +36,7 @@ function SortableItem({ id, file, thumbnail }) {
       style={style}
       {...attributes}
       {...listeners}
-      className="flex content-between flex-col items-center bg-gray-200/50 dark:bg-gray-800 backdrop-blur-sm rounded-lg p-2 cursor-grab border-transparent hover:border-gray-400 dark:hover:border-gray-400 hover:shadow-lg dark:hover:shadow-gray-700"
+      className="flex flex-col items-center bg-gray-200/50 dark:bg-gray-800 backdrop-blur-sm rounded-lg p-2 cursor-grab border-transparent hover:border-gray-400 dark:hover:border-gray-400 hover:shadow-lg dark:hover:shadow-gray-700"
     >
       <img src={thumbnail} alt={file.name} className="w-28 rounded-md mb-2 rounded-md transition-transform duration-300 bg-white dark:bg-gray-800" />
       <span className="text-xs text-gray-900 dark:text-gray-200 break-all text-center">{file.name}</span>

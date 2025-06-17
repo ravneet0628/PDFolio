@@ -14,11 +14,13 @@ import JpgToPdf from './pages/JpgToPdf';
 import Delete from './pages/Delete';
 import Duplicate from './pages/Duplicate';
 import PageNumbering from './pages/PageNumbering';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   return (
     <ThemeProvider>
       <Router>
+        <ScrollToTop />
         <div className="flex flex-col min-h-screen bg-gray-50 text-black dark:bg-gray-950 dark:text-white">
           <Navbar />
           <main className="flex-grow p-8">

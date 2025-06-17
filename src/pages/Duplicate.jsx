@@ -141,8 +141,8 @@ function Duplicate() {
   };
 
   return (
-    <div className="flex flex-col items-center p-6">
-      <h1 className="text-3xl font-bold mb-6">Duplicate PDF Pages</h1>
+    <div className="flex flex-col items-center p-6 bg-white dark:bg-gray-950 min-h-screen transition-colors">
+      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">Duplicate PDF Pages</h1>
 
       {!isLoading && showUploader && (
         <FileUploader onFilesSelected={handleFilesSelected} />
