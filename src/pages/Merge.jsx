@@ -36,10 +36,10 @@ function SortableItem({ id, file, thumbnail }) {
       style={style}
       {...attributes}
       {...listeners}
-      className="flex flex-col items-center bg-gray-100 dark:bg-gray-700 rounded-md p-2 cursor-grab"
+      className="flex flex-col items-center bg-gray-200/50 dark:bg-gray-800 backdrop-blur-sm rounded-lg p-2 cursor-grab border-transparent hover:border-gray-400 dark:hover:border-gray-400 hover:shadow-lg dark:hover:shadow-gray-700"
     >
-      <img src={thumbnail} alt={file.name} className="w-28 rounded-md mb-2" />
-      <span className="text-xs text-gray-700 dark:text-gray-200 break-all text-center">{file.name}</span>
+      <img src={thumbnail} alt={file.name} className="w-28 rounded-md mb-2 rounded-md transition-transform duration-300 bg-white dark:bg-gray-800" />
+      <span className="text-xs text-gray-900 dark:text-gray-200 break-all text-center">{file.name}</span>
     </div>
   );
 }
@@ -49,6 +49,7 @@ function Merge() {
   const [isLoading, setIsLoading] = useState(false);
   const [isWorking, setIsWorking] = useState(false);
   const [showUploader, setShowUploader] = useState(true);
+  
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -68,6 +69,7 @@ function Merge() {
     setFiles(filesWithThumbnails);
     setIsLoading(false);
     setShowUploader(false);
+    setShowGrid(true);
   };
 
   const renderThumbnail = async (file) => {
@@ -105,6 +107,7 @@ function Merge() {
     document.body.removeChild(link);
     setIsWorking(false);
     setShowUploader(true);
+    
   };
 
   return (
