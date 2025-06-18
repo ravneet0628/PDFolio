@@ -4,6 +4,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import { mergePDFs } from '../utils/mergePDF';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url';
+import Button from "../components/Button";
 
 import {
   DndContext,
@@ -38,7 +39,7 @@ function SortableItem({ id, file, thumbnail }) {
       {...listeners}
       className="flex flex-col items-center bg-gray-200/50 dark:bg-gray-800 backdrop-blur-sm rounded-lg p-2 cursor-grab border-transparent hover:border-gray-400 dark:hover:border-gray-400 hover:shadow-lg dark:hover:shadow-gray-700"
     >
-      <img src={thumbnail} alt={file.name} className="w-28 rounded-md mb-2 rounded-md transition-transform duration-300 bg-white dark:bg-gray-800" />
+      <img src={thumbnail} alt={file.name} className="w-28 rounded-lg mb-2 rounded-lg transition-transform duration-300 bg-white dark:bg-gray-800" />
       <span className="text-xs text-gray-900 dark:text-gray-200 break-all text-center">{file.name}</span>
     </div>
   );
@@ -49,6 +50,7 @@ function Merge() {
   const [isLoading, setIsLoading] = useState(false);
   const [isWorking, setIsWorking] = useState(false);
   const [showUploader, setShowUploader] = useState(true);
+  const [showGrid, setShowGrid] = useState(false);
   
 
   const sensors = useSensors(
@@ -140,13 +142,15 @@ function Merge() {
               </div>
             </SortableContext>
           </DndContext>
-          <button
+          <Button
             onClick={handleMerge}
             disabled={isLoading}
-            className="mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg"
+            variant="primary"
+            size="lg"
+            className="mt-8"
           >
             {isWorking ? 'Merging...' : 'Merge PDFs'}
-          </button>
+          </Button>
         </>
       )}
     </div>

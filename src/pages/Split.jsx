@@ -5,6 +5,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import FileUploader from '../components/FileUploader';
 import { splitPDF } from '../utils/splitPDF';
 import ThumbnailsGrid from '../components/ThumbnailsGrid';
+import Button from "../components/Button";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 
@@ -165,13 +166,15 @@ export default function Split() {
           {selectedPages.length > 0 && (
             <div className="flex flex-wrap gap-4 mt-8 justify-center">
               {getSplitRanges().map((range, idx) => (
-                <button
+                <Button
                   key={idx}
                   onClick={() => handleDownloadRange(range)}
-                  className="bg-blue-700 dark:bg-blue-600 hover:bg-blue-800 dark:hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-lg shadow"
+                  variant="primary"
+                  size="md"
+                  className="shadow"
                 >
                   {`Download Pages ${range[0]}-${range[1]}`}
-                </button>
+                </Button>
               ))}
             </div>
           )}

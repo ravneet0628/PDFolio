@@ -5,6 +5,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import ThumbnailsGrid from "../components/ThumbnailsGrid";
 import FileUploader from "../components/FileUploader";
+import Button from "../components/Button";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 
@@ -230,13 +231,15 @@ function PageNumbering() {
             selectedPages={[]}
             allowSelection={false}
           />
-          <button
+          <Button
             onClick={handleDownloadNumberedPDF}
-            className="mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg"
+            className="mt-8"
+            variant="primary"
+            size="lg"
             disabled={isWorking}
           >
             {isWorking ? 'Adding Numbers...' : 'Download Numbered PDF'}
-          </button>
+          </Button>
         </>
       )}
     </div>

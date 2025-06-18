@@ -4,6 +4,7 @@ import * as pdfjsLib from "pdfjs-dist/build/pdf";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
 import JSZip from "jszip";
 import LoadingSpinner from "../components/LoadingSpinner";
+import Button from "../components/Button";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
@@ -119,18 +120,18 @@ function PdfToJpg() {
 
       {images.length > 0 && !isLoading && !isWorking && (
         <div className="mt-4 flex flex-wrap gap-4">
-          <button onClick={selectAllPages} className="bg-cyan-700 dark:bg-cyan-600 hover:bg-cyan-600 dark:hover:bg-cyan-500 text-white font-bold py-2 px-4 rounded-lg">
+          <Button onClick={selectAllPages} variant="info" size="md">
             Select All
-          </button>
-          <button onClick={deselectAllPages} className="bg-red-700 dark:bg-red-600 hover:bg-red-600 dark:hover:bg-red-500 text-white font-bold py-2 px-4 rounded-lg">
+          </Button>
+          <Button onClick={deselectAllPages} variant="danger" size="md">
             Deselect All
-          </button>
-          <button onClick={downloadSelectedAsJpgs} className="bg-yellow-700 dark:bg-yellow-600 hover:bg-yellow-600 dark:hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded-lg">
+          </Button>
+          <Button onClick={downloadSelectedAsJpgs} variant="warning" size="md">
             Download Selected as JPGs
-          </button>
-          <button onClick={downloadZip} className="bg-blue-700 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-lg">
+          </Button>
+          <Button onClick={downloadZip} variant="primary" size="md">
             Download ZIP
-          </button>
+          </Button>
         </div>
       )}
 
@@ -148,15 +149,17 @@ function PdfToJpg() {
                   Page {index + 1}
                 </div>
                 <img src={img} alt={`Page ${index + 1}`} className="w-full rounded shadow bg-white dark:bg-gray-900" />
-                <button
-                  onClick={(e) => {
+                <Button
+                  onClick={e => {
                     e.stopPropagation();
                     downloadImage(img, index);
                   }}
-                  className="mt-2 bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-600 text-white py-1 px-3 rounded"
+                  variant="primary"
+                  size="sm"
+                  className="mt-2"
                 >
                   Download JPG
-                </button>
+                </Button>
               </div>
             ))}
           </div>

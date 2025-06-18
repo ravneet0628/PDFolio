@@ -5,6 +5,8 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import { PDFDocument, degrees } from "pdf-lib";
 
 import FileUploader from "../components/FileUploader";
+import Button from "../components/Button";
+import ThumbnailsGrid from "../components/ThumbnailsGrid";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 
@@ -149,84 +151,71 @@ function Rotate() {
         <>
           {/* Toolbar */}
           <div className="flex flex-wrap gap-2 mt-6 justify-center">
-            <button
+            <Button
               onClick={selectAllPages}
-              className="bg-cyan-700 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded-lg"
+              variant="info"
+              size="md"
             >
               Select All
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={deselectAllPages}
-              className="bg-red-700 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg"
+              variant="danger"
+              size="md"
             >
               Deselect All
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={selectOddPages}
-              className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg"
+              variant="neutral"
+              size="md"
             >
               Select Odd
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={selectEvenPages}
-              className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg"
+              variant="neutral"
+              size="md"
             >
               Select Even
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => applyRotation("counterclockwise")}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg"
+              variant="primary"
+              size="md"
             >
               ↺ Rotate Left
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => applyRotation("clockwise")}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg"
+              variant="primary"
+              size="md"
             >
               ↻ Rotate Right
-            </button>
-
+            </Button>
           </div>
 
-          {/* Thumbnails */}
-          <div className="w-auto h-auto px-4">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 pt-6 px-4 pb-4 mt-4 bg-gray-800/80 backdrop-blur-sm rounded-lg max-h-96 overflow-auto">
-              {thumbnails.map((thumb, idx) => {
-                const pageNum = idx + 1;
-                const rotation = pageRotations[pageNum] || 0;
+          {/* ThumbnailsGrid */}
+          <ThumbnailsGrid
+            thumbnails={thumbnails.map((thumb, idx) => ({
+              src: thumb,
+              rotation: pageRotations[idx + 1] || 0,
+            }))}
+            selectedPages={selectedPages}
+            onPageClick={togglePageSelection}
+            allowSelection={true}
+          />
 
-                return (
-                  <div
-                    key={idx}
-                    onClick={() => togglePageSelection(pageNum)}
-                    className={`border-4 rounded-lg overflow-hidden cursor-pointer transition
-                    ${selectedPages.includes(pageNum)
-                      ? "border-blue-400"
-                      : "border-transparent hover:border-blue-200"}`}
-                  >
-                    <div className="relative w-full">
-                      <img
-                        src={thumb}
-                        alt={`Page ${pageNum}`}
-                        className="w-28 transition-transform duration-300"
-                        style={{
-                          transform: `rotate(${rotation}deg)`,
-                        }}
-                      />
-                    </div>
-                    <p className="text-center text-gray-300 mt-2">Page {pageNum}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
           {/* Download Button */}
-          <button
+          <Button
             onClick={handleDownloadRotatedPDF}
-            className="mt-8 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg"
+            variant="success"
+            size="lg"
+            className="mt-8"
+            disabled={isWorking}
           >
             {isWorking ? 'Creating Rotated Pdf' : 'Download Rotated PDF'}
-          </button>
+          </Button>
         </>
       )}
     </div>

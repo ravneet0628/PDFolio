@@ -16,6 +16,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import LoadingSpinner from "../components/LoadingSpinner";
+import Button from "../components/Button";
 
 function SortableImage({ file, index, id, onDelete, isOver, isDragging }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging: dragging } = useSortable({ id });
@@ -41,12 +42,15 @@ function SortableImage({ file, index, id, onDelete, isOver, isDragging }) {
         Page {index + 1}
       </div>
       <img src={URL.createObjectURL(file)} alt={`Image ${index + 1}`} className="w-full max-h-56 object-contain bg-white dark:bg-gray-900" />
-      <button
+      <Button
         onClick={() => onDelete(id)}
-        className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white px-2 py-1 text-xs rounded shadow"
+        variant="danger"
+        size="sm"
+        className="absolute top-2 right-2 px-2 py-1 text-xs rounded shadow"
+        aria-label="Delete image"
       >
         ✕
-      </button>
+      </Button>
     </div>
   );
 }
@@ -163,13 +167,15 @@ function JpgToPdf() {
               </SortableContext>
             </DndContext>
           </div>
-          <button
+          <Button
             onClick={generatePdf}
             disabled={isWorking}
-            className="mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg disabled:opacity-50 shadow"
+            variant="primary"
+            size="lg"
+            className="mt-8 shadow"
           >
             {isWorking ? "Generating PDF..." : "Download PDF"}
-          </button>
+          </Button>
         </>
       )}
     </div>

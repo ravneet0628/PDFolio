@@ -6,6 +6,7 @@ import { PDFDocument } from "pdf-lib";
 import ThumbnailsGrid from "../components/ThumbnailsGrid";
 import FileUploader from "../components/FileUploader";
 import { deletePagesFromPDF } from "../utils/deletePages";
+import Button from "../components/Button";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 
@@ -116,30 +117,34 @@ function Delete() {
         <>
           {/* Toolbar */}
           <div className="flex flex-wrap gap-2 mt-6 justify-center">
-            <button
+            <Button
               onClick={selectAllPages}
-              className="bg-cyan-700 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded-lg"
+              variant="info"
+              size="md"
             >
               Select All
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={deselectAllPages}
-              className="bg-red-700 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg"
+              variant="danger"
+              size="md"
             >
               Deselect All
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={selectOddPages}
-              className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg"
+              variant="neutral"
+              size="md"
             >
               Select Odd
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={selectEvenPages}
-              className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg"
+              variant="neutral"
+              size="md"
             >
               Select Even
-            </button>
+            </Button>
           </div>
 
           <ThumbnailsGrid
@@ -150,13 +155,15 @@ function Delete() {
           />
 
           {/* Delete Button */}
-          <button
+          <Button
             onClick={handleDeletePages}
-            className="mt-8 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg"
+            variant="danger"
+            size="lg"
+            className="mt-8"
             disabled={selectedPages.length === 0 || isWorking}
           >
             {isWorking ? 'Deleting...' : 'Delete Selected Pages'}
-          </button>
+          </Button>
         </>
       )}
     </div>

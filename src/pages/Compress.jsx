@@ -2,6 +2,7 @@ import { useState } from "react";
 import FileUploader from "../components/FileUploader";
 import { PDFDocument } from "pdf-lib";
 import LoadingSpinner from "../components/LoadingSpinner";
+import Button from "../components/Button";
 
 function Compress() {
   const [file, setFile] = useState(null);
@@ -63,13 +64,15 @@ function Compress() {
       )}
 
       {showDownloadbutton && (
-      <button
+      <Button
         onClick={compressPDF}
         disabled={isWorking || !file}
-        className="mt-8 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg disabled:opacity-50"
+        variant="success"
+        size="lg"
+        className="mt-8"
       >
         Download Compressed PDF
-      </button>
+      </Button>
       )}
     </div>
   );

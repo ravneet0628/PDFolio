@@ -5,6 +5,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import { PDFDocument } from "pdf-lib";
 import ThumbnailsGrid from "../components/ThumbnailsGrid";
 import FileUploader from "../components/FileUploader";
+import Button from "../components/Button";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 
@@ -159,30 +160,34 @@ function Duplicate() {
         <>
           {/* Toolbar */}
           <div className="flex flex-wrap gap-2 mt-6 justify-center">
-            <button
+            <Button
               onClick={selectAllPages}
-              className="bg-cyan-700 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded-lg"
+              variant="info"
+              size="md"
             >
               Select All
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={deselectAllPages}
-              className="bg-red-700 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg"
+              variant="danger"
+              size="md"
             >
               Deselect All
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={selectOddPages}
-              className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg"
+              variant="neutral"
+              size="md"
             >
               Select Odd
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={selectEvenPages}
-              className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg"
+              variant="neutral"
+              size="md"
             >
               Select Even
-            </button>
+            </Button>
           </div>
 
           <ThumbnailsGrid
@@ -193,14 +198,16 @@ function Duplicate() {
             renderPageFooter={(pageNum) =>
               selectedPages.includes(pageNum) ? (
                 <div className="flex items-center gap-1 mt-1">
-                  <button
+                  <Button
                     type="button"
-                    className="px-2 py-1 rounded bg-red-600 text-white text-lg font-bold hover:bg-red-700"
+                    variant="danger"
+                    size="sm"
+                    className="px-2 py-1 text-lg font-bold"
                     onClick={e => { e.stopPropagation(); handleDuplicateCountDec(pageNum); }}
                     tabIndex={-1}
                   >
                     -
-                  </button>
+                  </Button>
                   <input
                     type="number"
                     min={1}
@@ -211,27 +218,31 @@ function Duplicate() {
                     style={{ margin: 0 }}
                     title="Number of duplicates"
                   />
-                  <button
+                  <Button
                     type="button"
-                    className="px-2 py-1 rounded bg-green-600 text-white text-lg font-bold hover:bg-green-700"
+                    variant="success"
+                    size="sm"
+                    className="px-2 py-1 text-lg font-bold"
                     onClick={e => { e.stopPropagation(); handleDuplicateCountInc(pageNum); }}
                     tabIndex={-1}
                   >
                     +
-                  </button>
+                  </Button>
                 </div>
               ) : null
             }
           />
 
           {/* Duplicate Button */}
-          <button
+          <Button
             onClick={handleDuplicatePages}
-            className="mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg"
+            className="mt-8"
+            variant="primary"
+            size="lg"
             disabled={selectedPages.length === 0 || isWorking}
           >
             {isWorking ? 'Duplicating...' : 'Duplicate Selected Pages'}
-          </button>
+          </Button>
         </>
       )}
     </div>

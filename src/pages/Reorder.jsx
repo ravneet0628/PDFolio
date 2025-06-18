@@ -20,6 +20,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 
 import FileUploader from "../components/FileUploader";
+import Button from "../components/Button";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 
@@ -44,7 +45,7 @@ function SortableThumbnail({ id, thumb, pageNum }) {
       dark:hover:shadow-gray-700"
     >
       <div>
-        <img src={thumb} alt={`Page ${pageNum}`} className="w-28 rounded-md mb-2 rounded-md transition-transform duration-300 bg-white dark:bg-gray-800" />
+        <img src={thumb} alt={`Page ${pageNum}`} className="w-28 rounded-lg mb-2 rounded-lg transition-transform duration-300 bg-white dark:bg-gray-800" />
       </div>
       <div>  
         <span className=" text-xs text-gray-900 dark:text-gray-200">Page {pageNum}</span>
@@ -164,13 +165,15 @@ function Reorder() {
               </div>
             </SortableContext>
           </DndContext>
-          <button
+          <Button
             onClick={handleDownloadReorderedPDF}
-            className="mt-8 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg"
+            className="mt-8"
+            variant="success"
+            size="lg"
             disabled={isWorking}
           >
             {isWorking ? 'Creating Reordered Pdf' : 'Download Reordered PDF'}
-          </button>
+          </Button>
         </>
       )}
     </div>
