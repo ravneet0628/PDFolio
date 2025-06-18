@@ -93,17 +93,14 @@ function JpgToPdf() {
       )}
       {files.length > 0 && !isLoading && !isWorking && (
         <>
-          <div className="w-full bg-gray-100 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg px-6 py-6 mt-6">
-            <SortableThumbnailsGrid
-              items={files}
-              onOrderChange={handleOrderChange}
-              onDelete={deleteFile}
-              getThumb={file => URL.createObjectURL(file)}
-              getId={file => file.name}
-              getFilename={file => file.name}
-              gridClass="grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-            />
-          </div>
+          <SortableThumbnailsGrid
+            items={files}
+            onOrderChange={handleOrderChange}
+            onDelete={deleteFile}
+            getThumb={file => URL.createObjectURL(file)}
+            getId={file => file.name}
+            getFilename={file => file.name}
+          />
           <Button
             onClick={generatePdf}
             disabled={isWorking}

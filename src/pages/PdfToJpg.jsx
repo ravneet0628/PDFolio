@@ -5,6 +5,7 @@ import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
 import JSZip from "jszip";
 import LoadingSpinner from "../components/LoadingSpinner";
 import Button from "../components/Button";
+import ThumbnailsGrid from "../components/ThumbnailsGrid";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
@@ -100,13 +101,27 @@ function PdfToJpg() {
     setSelectedPages([]);
   };
 
+  // RenderPageFooter for download button
+  const renderPageFooter = (pageNum) => (
+    <Button
+      onClick={e => {
+        e.stopPropagation();
+        downloadImage(images[pageNum - 1], pageNum - 1);
+      }}
+      variant="primary"
+      size="sm"
+      className="mt-2"
+    >
+      Download JPG
+    </Button>
+  );
+
   return (
     <div className="flex flex-col items-center p-6 min-h-screen bg-white dark:bg-gray-900 transition-colors">
       <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">PDF to JPG</h1>
       {showUploader && (
         <FileUploader onFilesSelected={handleFilesSelected} />
       )}
-
       {isLoading && (
         <div className="w-full max-w-md mt-6">
           <LoadingSpinner message="Rendering pages..." />
@@ -117,7 +132,6 @@ function PdfToJpg() {
           <LoadingSpinner message="Preparing ZIP..." />
         </div>
       )}
-
       {images.length > 0 && !isLoading && !isWorking && (
         <div className="mt-4 flex flex-wrap gap-4">
           <Button onClick={selectAllPages} variant="info" size="md">
@@ -134,36 +148,14 @@ function PdfToJpg() {
           </Button>
         </div>
       )}
-
-      {images.length > 0 && (
-        <div className="mt-8 w-full bg-gray-100 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg px-6 py-8">
-          <div className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mx-auto transition-opacity ${isLoading || isWorking ? 'blur-sm opacity-50' : ''}`}> 
-            {images.map((img, index) => (
-              <div
-                key={index}
-                className={`relative flex flex-col items-center border-4 rounded-lg overflow-hidden cursor-pointer transition 
-                  ${selectedPages.includes(index + 1) ? 'border-cyan-700 dark:border-cyan-400' : 'border-transparent hover:border-cyan-600 dark:hover:border-cyan-400'}`}
-                onClick={() => togglePageSelection(index + 1)}
-              >
-                <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
-                  Page {index + 1}
-                </div>
-                <img src={img} alt={`Page ${index + 1}`} className="w-full rounded shadow bg-white dark:bg-gray-900" />
-                <Button
-                  onClick={e => {
-                    e.stopPropagation();
-                    downloadImage(img, index);
-                  }}
-                  variant="primary"
-                  size="sm"
-                  className="mt-2"
-                >
-                  Download JPG
-                </Button>
-              </div>
-            ))}
-          </div>
-        </div>
+      {images.length > 0 && !isLoading && (
+        <ThumbnailsGrid
+          thumbnails={images.map((img, idx) => ({ src: img }))}
+          selectedPages={selectedPages}
+          onPageClick={togglePageSelection}
+          allowSelection={true}
+          renderPageFooter={renderPageFooter}
+        />
       )}
     </div>
   );
