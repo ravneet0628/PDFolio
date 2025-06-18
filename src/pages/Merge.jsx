@@ -5,45 +5,9 @@ import { mergePDFs } from '../utils/mergePDF';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url';
 import Button from "../components/Button";
+import SortableThumbnailsGrid from '../components/SortableThumbnailsGrid';
 
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  horizontalListSortingStrategy,
-  useSortable,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-
-// Setup PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
-
-function SortableItem({ id, file, thumbnail }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className="flex flex-col items-center bg-gray-200/50 dark:bg-gray-800 backdrop-blur-sm rounded-lg p-2 cursor-grab border-transparent hover:border-gray-400 dark:hover:border-gray-400 hover:shadow-lg dark:hover:shadow-gray-700"
-    >
-      <img src={thumbnail} alt={file.name} className="w-28 rounded-lg mb-2 rounded-lg transition-transform duration-300 bg-white dark:bg-gray-800" />
-      <span className="text-xs text-gray-900 dark:text-gray-200 break-all text-center">{file.name}</span>
-    </div>
-  );
-}
 
 function Merge() {
   const [files, setFiles] = useState([]);
@@ -51,12 +15,6 @@ function Merge() {
   const [isWorking, setIsWorking] = useState(false);
   const [showUploader, setShowUploader] = useState(true);
   const [showGrid, setShowGrid] = useState(false);
-  
-
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor)
-  );
 
   const handleFilesSelected = async (uploadedFiles) => {
     setIsLoading(true);
@@ -85,15 +43,8 @@ function Merge() {
     return canvas.toDataURL();
   };
 
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
-    if (active.id !== over.id) {
-      setFiles((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
-        return arrayMove(items, oldIndex, newIndex);
-      });
-    }
+  const handleOrderChange = (newOrder) => {
+    setFiles(newOrder);
   };
 
   const handleMerge = async () => {
@@ -109,7 +60,6 @@ function Merge() {
     document.body.removeChild(link);
     setIsWorking(false);
     setShowUploader(true);
-    
   };
 
   return (
@@ -126,22 +76,13 @@ function Merge() {
       {files.length > 0 && showGrid && (
         <>
           <p className="mt-6 text-gray-700 dark:text-gray-300">Drag PDFs to reorder:</p>
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={files.map(f => f.id)} strategy={horizontalListSortingStrategy}>
-              <div className="w-auto h-auto px-4">
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 pt-6 px-4 pb-4 mt-4 bg-gray-100 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg max-h-96 overflow-auto">
-                  {files.map((file) => (
-                    <SortableItem
-                      key={file.id}
-                      id={file.id}
-                      file={file.file}
-                      thumbnail={file.thumbnail}
-                    />
-                  ))}
-                </div>
-              </div>
-            </SortableContext>
-          </DndContext>
+          <SortableThumbnailsGrid
+            items={files}
+            onOrderChange={handleOrderChange}
+            getThumb={item => item.thumbnail}
+            getId={item => item.id}
+            getFilename={item => item.name}
+          />
           <Button
             onClick={handleMerge}
             disabled={isLoading}

@@ -1,59 +1,9 @@
 import { useState } from "react";
 import FileUploader from "../components/FileUploader";
 import { PDFDocument } from "pdf-lib";
-import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  useSortable,
-  arrayMove,
-  rectSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import LoadingSpinner from "../components/LoadingSpinner";
 import Button from "../components/Button";
-
-function SortableImage({ file, index, id, onDelete, isOver, isDragging }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging: dragging } = useSortable({ id });
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    zIndex: dragging ? 10 : 0,
-    boxShadow: dragging ? '0 10px 20px rgba(0,0,0,0.4)' : undefined,
-    scale: dragging ? 1.05 : 1,
-    cursor: dragging ? 'grabbing' : 'grab',
-    opacity: dragging ? 1 : 0.95,
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className="relative border-4 rounded-lg overflow-hidden bg-white dark:bg-gray-900 flex flex-col items-center transition border-transparent hover:border-blue-400 dark:hover:border-blue-300 shadow-md"
-    >
-      <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
-        Page {index + 1}
-      </div>
-      <img src={URL.createObjectURL(file)} alt={`Image ${index + 1}`} className="w-full max-h-56 object-contain bg-white dark:bg-gray-900" />
-      <Button
-        onClick={() => onDelete(id)}
-        variant="danger"
-        size="sm"
-        className="absolute top-2 right-2 px-2 py-1 text-xs rounded shadow"
-        aria-label="Delete image"
-      >
-        ✕
-      </Button>
-    </div>
-  );
-}
+import SortableThumbnailsGrid from '../components/SortableThumbnailsGrid';
 
 function JpgToPdf() {
   const [files, setFiles] = useState([]);
@@ -61,8 +11,6 @@ function JpgToPdf() {
   const [isWorking, setIsWorking] = useState(false); // for PDF generation
   const [showUploader, setShowUploader] = useState(true);
   const [error, setError] = useState("");
-
-  const sensors = useSensors(useSensor(PointerSensor));
 
   const handleFilesSelected = (newFiles) => {
     setIsLoading(true);
@@ -83,13 +31,8 @@ function JpgToPdf() {
     setShowUploader(false);
   };
 
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
-    if (active.id !== over?.id) {
-      const oldIndex = files.findIndex((file) => file.name === active.id);
-      const newIndex = files.findIndex((file) => file.name === over.id);
-      setFiles((files) => arrayMove(files, oldIndex, newIndex));
-    }
+  const handleOrderChange = (newOrder) => {
+    setFiles(newOrder);
   };
 
   const deleteFile = (id) => {
@@ -151,21 +94,15 @@ function JpgToPdf() {
       {files.length > 0 && !isLoading && !isWorking && (
         <>
           <div className="w-full bg-gray-100 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg px-6 py-6 mt-6">
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={files.map((f) => f.name)} strategy={rectSortingStrategy}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {files.map((file, index) => (
-                    <SortableImage
-                      key={file.name}
-                      id={file.name}
-                      file={file}
-                      index={index}
-                      onDelete={deleteFile}
-                    />
-                  ))}
-                </div>
-              </SortableContext>
-            </DndContext>
+            <SortableThumbnailsGrid
+              items={files}
+              onOrderChange={handleOrderChange}
+              onDelete={deleteFile}
+              getThumb={file => URL.createObjectURL(file)}
+              getId={file => file.name}
+              getFilename={file => file.name}
+              gridClass="grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+            />
           </div>
           <Button
             onClick={generatePdf}
