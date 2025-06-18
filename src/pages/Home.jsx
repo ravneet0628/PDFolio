@@ -102,6 +102,15 @@ const actions = [
 		iconBg: 'bg-fuchsia-50',
 		comingSoon: false,
 	},
+	{
+		title: 'Page Scaling & Layout',
+		description: 'Scale pages or arrange multiple per sheet (n-up).',
+		href: '/page-scaling',
+		icon: Squares2X2Icon,
+		iconColor: 'text-lime-600',
+		iconBg: 'bg-lime-50',
+		comingSoon: false,
+	},
 	// Add more as needed
 ];
 
@@ -123,6 +132,7 @@ const categories = [
 		actions: [
 			actions[7], // Compress PDF
 			actions[8], // Add Page Numbers
+			actions[11], // Page Scaling & Layout
 		],
 	},
 	{

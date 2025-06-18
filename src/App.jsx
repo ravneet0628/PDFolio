@@ -14,6 +14,7 @@ import JpgToPdf from './pages/JpgToPdf';
 import Delete from './pages/Delete';
 import Duplicate from './pages/Duplicate';
 import PageNumbering from './pages/PageNumbering';
+import PageScaling from './pages/PageScaling';
 import ScrollToTop from './components/ScrollToTop';
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
               <Route path="/delete" element={<Delete />} />
               <Route path="/duplicate" element={<Duplicate />} />
               <Route path="/page-numbering" element={<PageNumbering />} />
+              <Route path="/page-scaling" element={<PageScaling />} />
             </Routes>
           </main>
           <Footer />
