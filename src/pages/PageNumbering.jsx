@@ -6,6 +6,7 @@ import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import ThumbnailsGrid from "../components/ThumbnailsGrid";
 import FileUploader from "../components/FileUploader";
 import Button from "../components/Button";
+import { getOutputFileName } from '../utils/outputFilename';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 
@@ -136,7 +137,7 @@ function PageNumbering() {
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "numbered-pages.pdf";
+    link.download = getOutputFileName(file?.name, 'numbered');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

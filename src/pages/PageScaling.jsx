@@ -4,6 +4,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import Button from "../components/Button";
 import ThumbnailsGrid from "../components/ThumbnailsGrid";
 import { PDFDocument, rgb } from "pdf-lib";
+import { getOutputFileName } from '../utils/outputFilename';
 
 function PageScaling() {
   const [file, setFile] = useState(null);
@@ -94,7 +95,7 @@ function PageScaling() {
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `${layout.value}.pdf`;
+    link.download = getOutputFileName(file?.name, layout.value);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

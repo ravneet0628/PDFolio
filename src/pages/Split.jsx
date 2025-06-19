@@ -6,6 +6,7 @@ import FileUploader from '../components/FileUploader';
 import { splitPDF } from '../utils/splitPDF';
 import ThumbnailsGrid from '../components/ThumbnailsGrid';
 import Button from "../components/Button";
+import { getOutputFileName } from '../utils/outputFilename';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 
@@ -99,7 +100,7 @@ export default function Split() {
       const blob = new Blob([pdfBytes], { type: 'application/pdf' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = `pages-${range[0]}-${range[1]}.pdf`;
+      link.download = getOutputFileName(file?.name, 'split', `${range[0]}-${range[1]}`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -119,7 +120,7 @@ export default function Split() {
       const blob = await splitPDF(file, selectedPages)
       const link = document.createElement('a')
       link.href = URL.createObjectURL(blob)
-      link.download = 'split.pdf'
+      link.download = getOutputFileName(file?.name, 'split');
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)

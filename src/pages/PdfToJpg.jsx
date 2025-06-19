@@ -6,6 +6,7 @@ import JSZip from "jszip";
 import LoadingSpinner from "../components/LoadingSpinner";
 import Button from "../components/Button";
 import ThumbnailsGrid from "../components/ThumbnailsGrid";
+import { getOutputFileName } from '../utils/outputFilename';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
@@ -50,7 +51,7 @@ function PdfToJpg() {
   const downloadImage = (dataUrl, index) => {
     const link = document.createElement("a");
     link.href = dataUrl;
-    link.download = `page-${index + 1}.jpg`;
+    link.download = getOutputFileName(file?.name, 'page', index + 1, 'jpg');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -61,7 +62,7 @@ function PdfToJpg() {
       const img = images[pageNum - 1];
       const link = document.createElement("a");
       link.href = img;
-      link.download = `page-${pageNum}.jpg`;
+      link.download = getOutputFileName(file?.name, 'page', pageNum, 'jpg');
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -73,12 +74,12 @@ function PdfToJpg() {
     const zip = new JSZip();
     selectedPages.forEach((pageNum) => {
       const img = images[pageNum - 1];
-      zip.file(`page-${pageNum}.jpg`, img.split(",")[1], { base64: true });
+      zip.file(getOutputFileName(file?.name, 'page', pageNum, 'jpg'), img.split(",")[1], { base64: true });
     });
     const blob = await zip.generateAsync({ type: "blob" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "images.zip";
+    link.download = getOutputFileName(file?.name, 'images', null, 'zip');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

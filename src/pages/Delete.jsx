@@ -7,6 +7,7 @@ import ThumbnailsGrid from "../components/ThumbnailsGrid";
 import FileUploader from "../components/FileUploader";
 import { deletePagesFromPDF } from "../utils/deletePages";
 import Button from "../components/Button";
+import { getOutputFileName } from '../utils/outputFilename';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 
@@ -90,7 +91,7 @@ function Delete() {
     const blob = new Blob([newPdfBytes], { type: "application/pdf" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "deleted-pages.pdf";
+    link.download = getOutputFileName(file?.name, 'deleted');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

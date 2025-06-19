@@ -6,6 +6,7 @@ import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url';
 import Button from "../components/Button";
 import SortableThumbnailsGrid from '../components/SortableThumbnailsGrid';
+import { getOutputFileName } from '../utils/outputFilename';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 
@@ -54,7 +55,7 @@ function Merge() {
     const mergedBlob = await mergePDFs(fileList);
     const link = document.createElement('a');
     link.href = URL.createObjectURL(mergedBlob);
-    link.download = 'merged.pdf';
+    link.download = getOutputFileName(files[0]?.name, 'merged');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

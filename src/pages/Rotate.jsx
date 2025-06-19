@@ -3,6 +3,7 @@ import * as pdfjsLib from "pdfjs-dist/build/pdf";
 import pdfjsWorkerUrl from "pdfjs-dist/build/pdf.worker.mjs?url";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { PDFDocument, degrees } from "pdf-lib";
+import { getOutputFileName } from '../utils/outputFilename';
 
 import FileUploader from "../components/FileUploader";
 import Button from "../components/Button";
@@ -124,7 +125,7 @@ function Rotate() {
 
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "rotated.pdf";
+    link.download = getOutputFileName(file?.name, 'rotated');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

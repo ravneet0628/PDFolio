@@ -6,6 +6,7 @@ import { PDFDocument } from "pdf-lib";
 import FileUploader from "../components/FileUploader";
 import Button from "../components/Button";
 import SortableThumbnailsGrid from '../components/SortableThumbnailsGrid';
+import { getOutputFileName } from '../utils/outputFilename';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 
@@ -67,7 +68,7 @@ function Reorder() {
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "reordered.pdf";
+    link.download = getOutputFileName(file?.name, 'reordered');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
