@@ -11,8 +11,8 @@ function PageScaling() {
   const [isLoading, setIsLoading] = useState(false);
   const [isWorking, setIsWorking] = useState(false);
   const [showUploader, setShowUploader] = useState(true);
-  const [scalePercent, setScalePercent] = useState(100);
-  const [nUp, setNUp] = useState(1); // 1 = normal, 2 = 2-up, 4 = 4-up
+  const [scalePercent, setScalePercent] = useState('100');
+  const [layout, setLayout] = useState('1x1'); // Default to 1x1 layout
 
   // Render thumbnails for preview
   const renderThumbnails = async (pdfFile) => {
@@ -52,52 +52,38 @@ function PageScaling() {
     const arrayBuffer = await file.arrayBuffer();
     const srcPdf = await PDFDocument.load(arrayBuffer);
     let newPdf;
-    if (nUp === 1) {
+    const { cols, rows } = layout;
+    if (cols === 1 && rows === 1) {
       // Simple scaling
       newPdf = await PDFDocument.create();
       for (let i = 0; i < srcPdf.getPageCount(); i++) {
         const [copiedPage] = await newPdf.copyPages(srcPdf, [i]);
         const page = copiedPage;
-        const scale = scalePercent / 100;
+        const scale = (parseInt(scalePercent, 10) || 100) / 100;
         const { width, height } = page.getSize();
         page.setSize(width * scale, height * scale);
         newPdf.addPage(page);
       }
     } else {
-      // n-up layout (2 or 4 per sheet)
+      // n-up layout
       newPdf = await PDFDocument.create();
       const totalPages = srcPdf.getPageCount();
-      const perSheet = nUp;
+      const perSheet = cols * rows;
       for (let i = 0; i < totalPages; i += perSheet) {
         // Use size of first page as base
         const srcPage = srcPdf.getPage(i);
         const { width, height } = srcPage.getSize();
-        let newWidth, newHeight, positions;
-        if (nUp === 2) {
-          newWidth = width;
-          newHeight = height * 2;
-          positions = [
-            { x: 0, y: height },
-            { x: 0, y: 0 },
-          ];
-        } else {
-          // 4-up
-          newWidth = width * 2;
-          newHeight = height * 2;
-          positions = [
-            { x: 0, y: height },
-            { x: width, y: height },
-            { x: 0, y: 0 },
-            { x: width, y: 0 },
-          ];
-        }
+        const newWidth = width * cols;
+        const newHeight = height * rows;
         const sheet = newPdf.addPage([newWidth, newHeight]);
         for (let j = 0; j < perSheet && i + j < totalPages; j++) {
           const srcPage = srcPdf.getPage(i + j);
           const embedded = await newPdf.embedPage(srcPage);
+          const col = j % cols;
+          const row = Math.floor(j / cols);
           sheet.drawPage(embedded, {
-            x: positions[j].x,
-            y: positions[j].y,
+            x: col * width,
+            y: newHeight - (row + 1) * height,
             width: width,
             height: height,
           });
@@ -108,13 +94,49 @@ function PageScaling() {
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = nUp === 1 ? `scaled.pdf` : `${nUp}-up.pdf`;
+    link.download = `${layout.value}.pdf`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     setIsWorking(false);
     setShowUploader(true);
   };
+
+  // Visualization icons and layout options
+  const layoutOptions = [
+    {
+      value: '1x1',
+      label: '1x1 (Single)',
+      icon: (
+        <svg width="32" height="32" viewBox="0 0 32 32"><rect x="6" y="6" width="20" height="20" rx="3" fill="#a3e635" stroke="#65a30d" strokeWidth="2"/></svg>
+      ),
+      cols: 1, rows: 1
+    },
+    {
+      value: '2x1',
+      label: '2x1 (Horizontal)',
+      icon: (
+        <svg width="32" height="32" viewBox="0 0 32 32"><rect x="6" y="6" width="10" height="20" rx="2" fill="#a5b4fc" stroke="#6366f1" strokeWidth="2"/><rect x="16" y="6" width="10" height="20" rx="2" fill="#a5b4fc" stroke="#6366f1" strokeWidth="2"/></svg>
+      ),
+      cols: 2, rows: 1
+    },
+    {
+      value: '1x2',
+      label: '1x2 (Vertical)',
+      icon: (
+        <svg width="32" height="32" viewBox="0 0 32 32"><rect x="6" y="6" width="20" height="10" rx="2" fill="#fca5a5" stroke="#dc2626" strokeWidth="2"/><rect x="6" y="16" width="20" height="10" rx="2" fill="#fca5a5" stroke="#dc2626" strokeWidth="2"/></svg>
+      ),
+      cols: 1, rows: 2
+    },
+    {
+      value: '2x2',
+      label: '2x2 (Grid)',
+      icon: (
+        <svg width="32" height="32" viewBox="0 0 32 32"><rect x="6" y="6" width="10" height="10" rx="2" fill="#fcd34d" stroke="#ca8a04" strokeWidth="2"/><rect x="16" y="6" width="10" height="10" rx="2" fill="#fcd34d" stroke="#ca8a04" strokeWidth="2"/><rect x="6" y="16" width="10" height="10" rx="2" fill="#fcd34d" stroke="#ca8a04" strokeWidth="2"/><rect x="16" y="16" width="10" height="10" rx="2" fill="#fcd34d" stroke="#ca8a04" strokeWidth="2"/></svg>
+      ),
+      cols: 2, rows: 2
+    },
+  ];
 
   return (
     <div className="flex flex-col items-center p-6 bg-white dark:bg-gray-950 min-h-screen transition-colors">
@@ -137,23 +159,35 @@ function PageScaling() {
                 min={10}
                 max={400}
                 value={scalePercent}
-                onChange={e => setScalePercent(Math.max(10, Math.min(400, Number(e.target.value))))}
-                className="w-20 px-2 py-1 rounded border border-gray-300 dark:bg-gray-800 dark:text-gray-100"
+                onChange={e => setScalePercent(e.target.value)}
+                onBlur={e => {
+                  let val = parseInt(e.target.value, 10);
+                  if (isNaN(val)) val = 100;
+                  val = Math.max(10, Math.min(400, val));
+                  setScalePercent(String(val));
+                }}
+                className="w-20 px-2 py-1 rounded border border-gray-300 
+                text-gray-900 disabled:text-gray-500 dark:text-gray-100 dark:disabled:text-gray-400
+                dark:bg-gray-800 disabled:bg-gray-200 dark:disabled:bg-gray-600"
+                disabled={!(layout.cols === 1 && layout.rows === 1)}
               />
               <span>%</span>
             </label>
-            <label className="flex items-center gap-2">
-              <span className="font-medium">Pages per sheet:</span>
-              <select
-                value={nUp}
-                onChange={e => setNUp(Number(e.target.value))}
-                className="px-2 py-1 rounded border border-gray-300 dark:bg-gray-800 dark:text-gray-100"
-              >
-                <option value={1}>1 (Normal)</option>
-                <option value={2}>2-up</option>
-                <option value={4}>4-up</option>
-              </select>
-            </label>
+            <div className="flex items-center gap-2">
+              <span className="font-medium">Layout:</span>
+              {layoutOptions.map(opt => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setLayout(opt)}
+                  className={`flex flex-col items-center px-2 py-1 rounded border-2 transition focus:outline-none ${layout.value === opt.value ? 'border-blue-600 bg-blue-50 dark:bg-blue-900' : 'border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800'}`}
+                  aria-label={opt.label}
+                >
+                  {opt.icon}
+                  <span className="text-xs mt-1 text-gray-700 dark:text-gray-200">{opt.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
           <ThumbnailsGrid
             thumbnails={thumbnails}
@@ -165,7 +199,7 @@ function PageScaling() {
             className="mt-8"
             disabled={isWorking}
           >
-            {isWorking ? (nUp === 1 ? 'Scaling...' : 'Creating Layout...') : (nUp === 1 ? 'Download Scaled PDF' : `Download ${nUp}-up PDF`)}
+            {isWorking ? (layout.cols === 1 && layout.rows === 1 ? 'Scaling...' : 'Creating Layout...') : (layout.cols === 1 && layout.rows === 1 ? 'Download Scaled PDF' : `Download ${layout.value} PDF`)}
           </Button>
         </>
       )}
