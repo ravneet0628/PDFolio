@@ -2,8 +2,11 @@ import { useState } from "react";
 import FileUploader from "../components/FileUploader";
 import { PDFDocument } from "pdf-lib";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { useToasts } from '../components/ToastManager';
+import { analyzeFileUpload } from '../utils/fileProcessing';
 import Button from "../components/Button";
 import SortableThumbnailsGrid from '../components/SortableThumbnailsGrid';
+import GlobalDropZone from '../components/GlobalDropZone';
 import { getOutputFileName } from '../utils/outputFilename';
 
 function JpgToPdf() {
@@ -12,24 +15,38 @@ function JpgToPdf() {
   const [isWorking, setIsWorking] = useState(false); // for PDF generation
   const [showUploader, setShowUploader] = useState(true);
   const [error, setError] = useState("");
+  const { addToast, ToastContainer } = useToasts();
 
   const handleFilesSelected = (newFiles) => {
     setIsLoading(true);
     setError("");
-    // Only accept image files (jpg, jpeg, png)
-    const validFiles = Array.from(newFiles).filter(f =>
-      f.type.startsWith("image/") &&
-      (f.type.endsWith("jpeg") || f.type.endsWith("jpg") || f.type.endsWith("png"))
+    
+    // Analyze uploaded files with comprehensive edge case handling
+    const analysis = analyzeFileUpload(
+      Array.from(newFiles),
+      'image/jpeg,image/png',
+      files,
+      { allowDuplicates: false }
     );
-    if (validFiles.length !== newFiles.length) {
-      setError("Some files were not valid images (JPG or PNG) and were ignored.");
+    
+    // Show appropriate toasts based on analysis
+    analysis.info.forEach(message => addToast(message, 'success', 3000));
+    analysis.warnings.forEach(message => addToast(message, 'warning', 4000));
+    analysis.errors.forEach(message => addToast(message, 'error', 5000));
+    
+    if (analysis.validFiles.length === 0) {
+      setIsLoading(false);
+      return;
     }
-    const updatedFiles = [...files, ...validFiles];
-    const uniqueFiles = Array.from(new Set(updatedFiles.map(f => f.name)))
-      .map(name => updatedFiles.find(f => f.name === name));
-    setFiles(uniqueFiles);
+    
+    // Append to existing files
+    const updatedFiles = [...files, ...analysis.validFiles];
+    
+    setFiles(updatedFiles);
     setIsLoading(false);
-    setShowUploader(false);
+    if (files.length === 0) {
+      setShowUploader(false);
+    }
   };
 
   const handleOrderChange = (newOrder) => {
@@ -73,9 +90,44 @@ function JpgToPdf() {
 
   return (
     <div className="flex flex-col items-center p-6 bg-white dark:bg-gray-950 min-h-screen transition-colors">
+      <GlobalDropZone 
+        onFilesDropped={handleFilesSelected} 
+        accept="image/jpeg,image/png"
+        enabled={!isLoading && !isWorking}
+      />
       <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100 text-center">JPG to PDF</h1>
-      {showUploader && (
-        <FileUploader onFilesSelected={handleFilesSelected} multiple accept="image/jpeg,image/png" />
+      
+      {files.length === 0 ? (
+        // Initial upload - show full FileUploader
+        showUploader && (
+          <FileUploader 
+            onFilesSelected={handleFilesSelected} 
+            multiple 
+            accept="image/jpeg,image/png"
+          />
+        )
+      ) : (
+        // Files already added - show compact add more section
+        <div className="w-full max-w-md text-center mb-4">
+          <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
+            Drag & drop more images anywhere on this page to add them
+          </p>
+          <Button
+            onClick={() => document.querySelector('input[type="file"]')?.click()}
+            variant="secondary"
+            size="sm"
+            className="text-sm"
+          >
+            🖼️ Browse for more images
+          </Button>
+          <input
+            type="file"
+            multiple
+            accept="image/jpeg,image/png"
+            onChange={(e) => handleFilesSelected(Array.from(e.target.files))}
+            className="hidden"
+          />
+        </div>
       )}
       {error && (
         <div className="w-full max-w-md mt-4 text-red-600 bg-red-100 dark:bg-red-900 dark:text-red-300 rounded p-3 text-center">
@@ -94,25 +146,33 @@ function JpgToPdf() {
       )}
       {files.length > 0 && !isLoading && !isWorking && (
         <>
-          <SortableThumbnailsGrid
-            items={files}
-            onOrderChange={handleOrderChange}
-            onDelete={deleteFile}
-            getThumb={file => URL.createObjectURL(file)}
-            getId={file => file.name}
-            getFilename={file => file.name}
-          />
-          <Button
-            onClick={generatePdf}
-            disabled={isWorking}
-            variant="primary"
-            size="lg"
-            className="mt-8 shadow"
-          >
-            {isWorking ? "Generating PDF..." : "Download PDF"}
-          </Button>
+          <div className="w-full max-w-4xl">
+            <SortableThumbnailsGrid
+              items={files}
+              onOrderChange={handleOrderChange}
+              onDelete={deleteFile}
+              getThumb={file => URL.createObjectURL(file)}
+              getId={file => file.name}
+              getFilename={file => file.name}
+            />
+          </div>
+          
+          <div className="flex justify-center mt-8">
+            <Button
+              onClick={generatePdf}
+              disabled={isWorking}
+              variant="primary"
+              size="lg"
+              className="shadow"
+            >
+              {isWorking ? "Generating PDF..." : "Download PDF"}
+            </Button>
+          </div>
         </>
       )}
+      
+      {/* Toast Notifications */}
+      <ToastContainer />
     </div>
   );
 }

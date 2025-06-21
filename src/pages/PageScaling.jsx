@@ -1,6 +1,9 @@
 import { useState } from "react";
 import FileUploader from "../components/FileUploader";
+import GlobalDropZone from '../components/GlobalDropZone';
 import LoadingSpinner from "../components/LoadingSpinner";
+import { useToasts } from '../components/ToastManager';
+import { analyzeFileUpload } from '../utils/fileProcessing';
 import Button from "../components/Button";
 import ThumbnailsGrid from "../components/ThumbnailsGrid";
 import { PDFDocument, rgb } from "pdf-lib";
@@ -12,6 +15,7 @@ function PageScaling() {
   const [isLoading, setIsLoading] = useState(false);
   const [isWorking, setIsWorking] = useState(false);
   const [showUploader, setShowUploader] = useState(true);
+  const { addToast, ToastContainer } = useToasts();
   const [scalePercent, setScalePercent] = useState('100');
   const [layout, setLayout] = useState('1x1'); // Default to 1x1 layout
 
@@ -39,10 +43,24 @@ function PageScaling() {
   };
 
   const handleFilesSelected = async (files) => {
-    if (files.length > 0) {
-      setFile(files[0]);
+    // Analyze uploaded files
+    const analysis = analyzeFileUpload(
+      files,
+      'application/pdf',
+      file ? [file] : [],
+      { singleFileMode: true }
+    );
+
+    // Show appropriate toasts
+    analysis.info.forEach(message => addToast(message, 'success', 3000));
+    analysis.warnings.forEach(message => addToast(message, 'warning', 4000));
+    analysis.errors.forEach(message => addToast(message, 'error', 5000));
+
+    if (analysis.validFiles.length > 0) {
+      const pdfFile = analysis.validFiles[0];
+      setFile(pdfFile);
       setShowUploader(false);
-      await renderThumbnails(files[0]);
+      await renderThumbnails(pdfFile);
     }
   };
 
@@ -142,8 +160,38 @@ function PageScaling() {
   return (
     <div className="flex flex-col items-center p-6 bg-white dark:bg-gray-950 min-h-screen transition-colors">
       <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100 text-center">PDF Page Scaling & Layout</h1>
+      
+      {/* Global Drop Zone */}
+      <GlobalDropZone 
+        onFilesDropped={handleFilesSelected}
+        acceptedTypes="application/pdf"
+      />
+      
       {showUploader && (
         <FileUploader onFilesSelected={handleFilesSelected} />
+      )}
+      
+      {!showUploader && file && !isLoading && (
+        <div className="w-full max-w-4xl mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
+          <div className="text-center">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+              Drag & drop a new PDF anywhere on this page to replace current file
+            </p>
+            <Button
+              onClick={() => document.querySelector('input[type="file"]')?.click()}
+              variant="secondary"
+              size="sm"
+            >
+              Browse Files
+            </Button>
+            <input
+              type="file"
+              accept="application/pdf"
+              onChange={(e) => e.target.files && handleFilesSelected(Array.from(e.target.files))}
+              className="hidden"
+            />
+          </div>
+        </div>
       )}
       {isLoading && (
         <div className="mt-8">
@@ -204,6 +252,8 @@ function PageScaling() {
           </Button>
         </>
       )}
+      {/* Toast Notifications */}
+      <ToastContainer />
     </div>
   );
 }

@@ -1,9 +1,12 @@
 import { useState } from "react";
 import FileUploader from "../components/FileUploader";
+import { useToasts } from '../components/ToastManager';
+import { analyzeFileUpload } from '../utils/fileProcessing';
 import * as pdfjsLib from "pdfjs-dist/build/pdf";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
 import JSZip from "jszip";
 import LoadingSpinner from "../components/LoadingSpinner";
+import GlobalDropZone from '../components/GlobalDropZone';
 import Button from "../components/Button";
 import ThumbnailsGrid from "../components/ThumbnailsGrid";
 import { getOutputFileName } from '../utils/outputFilename';
@@ -17,12 +20,26 @@ function PdfToJpg() {
   const [isLoading, setIsLoading] = useState(false); // replaces isRendering for consistency
   const [isWorking, setIsWorking] = useState(false);
   const [showUploader, setShowUploader] = useState(true);
+  const { addToast, ToastContainer } = useToasts();
 
   const handleFilesSelected = async (files) => {
-    if (files.length > 0) {
-      setFile(files[0]);
+    // Analyze uploaded files
+    const analysis = analyzeFileUpload(
+      files,
+      'application/pdf',
+      file ? [file] : [],
+      { singleFileMode: true }
+    );
+
+    // Show appropriate toasts
+    analysis.info.forEach(message => addToast(message, 'success', 3000));
+    analysis.warnings.forEach(message => addToast(message, 'warning', 4000));
+    analysis.errors.forEach(message => addToast(message, 'error', 5000));
+
+    if (analysis.validFiles.length > 0) {
+      setFile(analysis.validFiles[0]);
       setShowUploader(false);
-      await generateImages(files[0]);
+      await generateImages(analysis.validFiles[0]);
     }
   };
 
@@ -120,9 +137,40 @@ function PdfToJpg() {
   return (
     <div className="flex flex-col items-center p-6 min-h-screen bg-white dark:bg-gray-900 transition-colors">
       <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100 text-center">PDF to JPG</h1>
+      
+      {/* Global Drop Zone */}
+      <GlobalDropZone 
+        onFilesDropped={handleFilesSelected}
+        acceptedTypes="application/pdf"
+      />
+      
       {showUploader && (
         <FileUploader onFilesSelected={handleFilesSelected} />
       )}
+      
+      {!showUploader && file && !isLoading && (
+        <div className="w-full max-w-4xl mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
+          <div className="text-center">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+              Drag & drop a new PDF anywhere on this page to replace current file
+            </p>
+            <Button
+              onClick={() => document.querySelector('input[type="file"]')?.click()}
+              variant="secondary"
+              size="sm"
+            >
+              Browse Files
+            </Button>
+            <input
+              type="file"
+              accept="application/pdf"
+              onChange={(e) => e.target.files && handleFilesSelected(Array.from(e.target.files))}
+              className="hidden"
+            />
+          </div>
+        </div>
+      )}
+      
       {isLoading && (
         <div className="w-full max-w-md mt-6">
           <LoadingSpinner message="Rendering pages..." />
@@ -158,6 +206,9 @@ function PdfToJpg() {
           renderPageFooter={renderPageFooter}
         />
       )}
+      
+      {/* Toast Notifications */}
+      <ToastContainer />
     </div>
   );
 }

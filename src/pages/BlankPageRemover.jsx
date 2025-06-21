@@ -7,6 +7,8 @@ import ThumbnailsGrid from "../components/ThumbnailsGrid";
 import FileUploader from "../components/FileUploader";
 import { deletePagesFromPDF } from "../utils/deletePages";
 import Button from "../components/Button";
+import GlobalDropZone from "../components/GlobalDropZone";
+import Toast from "../components/Toast";
 import { getOutputFileName } from '../utils/outputFilename';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
@@ -24,15 +26,31 @@ function BlankPageRemover() {
   const [analysisComplete, setAnalysisComplete] = useState(false);
   const [blankThreshold, setBlankThreshold] = useState(0.5);
   const [pageContentPercentages, setPageContentPercentages] = useState([]);
+  const [toast, setToast] = useState(null);
 
   const handleFilesSelected = async (files) => {
-    if (files.length > 0) {
-      const pdfFile = files[0];
+    // Filter valid PDF files
+    const validFiles = files.filter(file => file.type === 'application/pdf');
+    const invalidCount = files.length - validFiles.length;
+    
+    if (invalidCount > 0) {
+      setToast({
+        message: `${invalidCount} file${invalidCount > 1 ? 's' : ''} filtered out (only PDF files allowed)`,
+        type: 'warning'
+      });
+    }
+    
+    if (validFiles.length > 0) {
+      const pdfFile = validFiles[0];
       setFile(pdfFile);
       setSelectedPages([]);
       setBlankPages([]);
       setAnalysisComplete(false);
       setPageContentPercentages([]);
+      setToast({
+        message: 'PDF loaded successfully - analyzing for blank pages...',
+        type: 'success'
+      });
       await renderThumbnailsAndAnalyze(pdfFile);
     }
   };
@@ -242,6 +260,11 @@ function BlankPageRemover() {
 
   return (
     <div className="flex flex-col items-center p-6 bg-white dark:bg-gray-950 min-h-screen transition-colors">
+      <GlobalDropZone 
+        onFilesDropped={handleFilesSelected} 
+        accept="application/pdf"
+        enabled={!isLoading && !isWorking && !isAnalyzing}
+      />
       <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100 text-center">Remove Blank Pages</h1>
       
       <p className="text-gray-600 dark:text-gray-400 text-center mb-4 max-w-2xl">
@@ -276,8 +299,34 @@ function BlankPageRemover() {
         </div>
       )}
 
-      {!isLoading && showUploader && (
-        <FileUploader onFilesSelected={handleFilesSelected} />
+      {!file ? (
+        // No file loaded - show full FileUploader
+        !isLoading && showUploader && (
+          <FileUploader onFilesSelected={handleFilesSelected} multiple={false} />
+        )
+      ) : (
+        // File loaded - show compact replace option (only when not in analysis)
+        !analysisComplete && !isLoading && !isAnalyzing && (
+          <div className="w-full max-w-md text-center mb-4">
+            <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
+              Drag & drop a new PDF anywhere on this page to replace current file
+            </p>
+            <Button
+              onClick={() => document.querySelector('input[type="file"]')?.click()}
+              variant="secondary"
+              size="sm"
+              className="text-sm"
+            >
+              📁 Browse for different PDF
+            </Button>
+            <input
+              type="file"
+              accept="application/pdf"
+              onChange={(e) => handleFilesSelected(Array.from(e.target.files))}
+              className="hidden"
+            />
+          </div>
+        )
       )}
 
       {/* Show loading/analyzing spinner */}
@@ -428,6 +477,15 @@ function BlankPageRemover() {
             </Button>
           )}
         </>
+      )}
+      
+      {/* Toast Notifications */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
       )}
     </div>
   );

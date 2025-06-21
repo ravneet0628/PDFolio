@@ -2,9 +2,12 @@ import { useState } from "react";
 import * as pdfjsLib from "pdfjs-dist/build/pdf";
 import pdfjsWorkerUrl from "pdfjs-dist/build/pdf.worker.mjs?url";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { useToasts } from '../components/ToastManager';
+import { analyzeFileUpload } from '../utils/fileProcessing';
 import { PDFDocument } from "pdf-lib";
 import ThumbnailsGrid from "../components/ThumbnailsGrid";
 import FileUploader from "../components/FileUploader";
+import GlobalDropZone from '../components/GlobalDropZone';
 import Button from "../components/Button";
 import { getOutputFileName } from '../utils/outputFilename';
 
@@ -18,13 +21,28 @@ function Duplicate() {
   const [isLoading, setIsLoading] = useState(false);
   const [isWorking, setIsWorking] = useState(false);
   const [showUploader, setShowUploader] = useState(true);
+  const { addToast, ToastContainer } = useToasts();
   const [duplicateCounts, setDuplicateCounts] = useState({}); // pageNum: count
 
   const handleFilesSelected = async (files) => {
-    if (files.length > 0) {
-      const pdfFile = files[0];
+    // Analyze uploaded files
+    const analysis = analyzeFileUpload(
+      files,
+      'application/pdf',
+      file ? [file] : [],
+      { singleFileMode: true }
+    );
+
+    // Show appropriate toasts
+    analysis.info.forEach(message => addToast(message, 'success', 3000));
+    analysis.warnings.forEach(message => addToast(message, 'warning', 4000));
+    analysis.errors.forEach(message => addToast(message, 'error', 5000));
+
+    if (analysis.validFiles.length > 0) {
+      const pdfFile = analysis.validFiles[0];
       setFile(pdfFile);
       setSelectedPages([]);
+      setDuplicateCounts({});
       renderThumbnails(pdfFile);
     }
   };
@@ -149,6 +167,29 @@ function Duplicate() {
       {!isLoading && showUploader && (
         <FileUploader onFilesSelected={handleFilesSelected} />
       )}
+      
+      {!showUploader && file && !isLoading && (
+        <div className="w-full max-w-4xl mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
+          <div className="text-center">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+              Drag & drop a new PDF anywhere on this page to replace current file
+            </p>
+            <Button
+              onClick={() => document.querySelector('input[type="file"]')?.click()}
+              variant="secondary"
+              size="sm"
+            >
+              Browse Files
+            </Button>
+            <input
+              type="file"
+              accept="application/pdf"
+              onChange={(e) => e.target.files && handleFilesSelected(Array.from(e.target.files))}
+              className="hidden"
+            />
+          </div>
+        </div>
+      )}
 
       {/* Show loading spinner when processing thumbnails */}
       {isLoading && !thumbnails.length && (
@@ -246,6 +287,8 @@ function Duplicate() {
           </Button>
         </>
       )}
+      {/* Toast Notifications */}
+      <ToastContainer />
     </div>
   );
 }

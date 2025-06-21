@@ -6,6 +6,8 @@ import { PDFDocument } from "pdf-lib";
 import FileUploader from "../components/FileUploader";
 import Button from "../components/Button";
 import SortableThumbnailsGrid from '../components/SortableThumbnailsGrid';
+import GlobalDropZone from '../components/GlobalDropZone';
+import Toast from '../components/Toast';
 import { getOutputFileName } from '../utils/outputFilename';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
@@ -18,11 +20,27 @@ function Reorder() {
   const [isLoading, setIsLoading] = useState(false);
   const [isWorking, setIsWorking] = useState(false);
   const [showUploader, setShowUploader] = useState(true);
+  const [toast, setToast] = useState(null);
 
   const handleFilesSelected = async (files) => {
-    if (files.length > 0) {
-      const pdfFile = files[0];
+    // Filter valid PDF files
+    const validFiles = files.filter(file => file.type === 'application/pdf');
+    const invalidCount = files.length - validFiles.length;
+    
+    if (invalidCount > 0) {
+      setToast({
+        message: `${invalidCount} file${invalidCount > 1 ? 's' : ''} filtered out (only PDF files allowed)`,
+        type: 'warning'
+      });
+    }
+    
+    if (validFiles.length > 0) {
+      const pdfFile = validFiles[0];
       setFile(pdfFile);
+      setToast({
+        message: 'PDF loaded successfully',
+        type: 'success'
+      });
       await renderThumbnails(pdfFile);
     }
   };
@@ -81,9 +99,39 @@ function Reorder() {
 
   return (
     <div className="flex flex-col items-center p-6 bg-white dark:bg-gray-950 min-h-screen transition-colors">
+      <GlobalDropZone 
+        onFilesDropped={handleFilesSelected} 
+        accept="application/pdf"
+        enabled={!isLoading && !isWorking}
+      />
       <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100 text-center">Reorder PDF Pages</h1>
-      {!isLoading && showUploader && (
-        <FileUploader onFilesSelected={handleFilesSelected} />
+      
+      {!file ? (
+        // No file loaded - show full FileUploader
+        !isLoading && showUploader && (
+          <FileUploader onFilesSelected={handleFilesSelected} multiple={false} />
+        )
+      ) : (
+        // File loaded - show compact replace option
+        <div className="w-full max-w-md text-center mb-4">
+          <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
+            Drag & drop a new PDF anywhere on this page to replace current file
+          </p>
+          <Button
+            onClick={() => document.querySelector('input[type="file"]')?.click()}
+            variant="secondary"
+            size="sm"
+            className="text-sm"
+          >
+            📁 Browse for different PDF
+          </Button>
+          <input
+            type="file"
+            accept="application/pdf"
+            onChange={(e) => handleFilesSelected(Array.from(e.target.files))}
+            className="hidden"
+          />
+        </div>
       )}
       {isLoading && !thumbnails.length && (
         <div className="mt-8">
@@ -110,6 +158,15 @@ function Reorder() {
             {isWorking ? 'Creating Reordered Pdf' : 'Download Reordered PDF'}
           </Button>
         </>
+      )}
+      
+      {/* Toast Notifications */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
       )}
     </div>
   );

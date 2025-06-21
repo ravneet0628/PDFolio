@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import FileUploader from '../components/FileUploader';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { useToasts } from '../components/ToastManager';
+import { analyzeFileUpload } from '../utils/fileProcessing';
 import { mergePDFs } from '../utils/mergePDF';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url';
 import Button from "../components/Button";
 import SortableThumbnailsGrid from '../components/SortableThumbnailsGrid';
+import GlobalDropZone from '../components/GlobalDropZone';
 import { getOutputFileName } from '../utils/outputFilename';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
@@ -16,21 +19,46 @@ function Merge() {
   const [isWorking, setIsWorking] = useState(false);
   const [showUploader, setShowUploader] = useState(true);
   const [showGrid, setShowGrid] = useState(false);
+  const { addToast, ToastContainer } = useToasts();
 
   const handleFilesSelected = async (uploadedFiles) => {
     setIsLoading(true);
+    
+    // Analyze uploaded files with comprehensive edge case handling
+    const analysis = analyzeFileUpload(
+      uploadedFiles, 
+      'application/pdf', 
+      files.map(f => f.file),
+      { allowDuplicates: false }
+    );
+    
+    // Show appropriate toasts based on analysis
+    analysis.info.forEach(message => addToast(message, 'success', 3000));
+    analysis.warnings.forEach(message => addToast(message, 'warning', 4000));
+    analysis.errors.forEach(message => addToast(message, 'error', 5000));
+    
+    if (analysis.validFiles.length === 0) {
+      setIsLoading(false);
+      return;
+    }
+    
+    const startIndex = files.length; // For unique IDs when adding more files
     const filesWithThumbnails = await Promise.all(
-      uploadedFiles.map(async (file, index) => ({
-        id: `${index}-${file.name}`,
+      analysis.validFiles.map(async (file, index) => ({
+        id: `${startIndex + index}-${file.name}`,
         file,
         name: file.name,
         thumbnail: await renderThumbnail(file),
       }))
     );
-    setFiles(filesWithThumbnails);
+    
+    // Append to existing files
+    const updatedFiles = [...files, ...filesWithThumbnails];
+    
+    setFiles(updatedFiles);
     setIsLoading(false);
-    setShowUploader(false);
     setShowGrid(true);
+    // Keep uploader visible for adding more files
   };
 
   const renderThumbnail = async (file) => {
@@ -60,14 +88,50 @@ function Merge() {
     link.click();
     document.body.removeChild(link);
     setIsWorking(false);
+    setFiles([]);
+    setShowGrid(false);
     setShowUploader(true);
   };
 
   return (
     <div className="flex flex-col items-center p-6 bg-white dark:bg-gray-950 min-h-screen transition-colors">
+      <GlobalDropZone 
+        onFilesDropped={handleFilesSelected} 
+        accept="application/pdf"
+        enabled={!isLoading && !isWorking}
+      />
       <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100 text-center">Merge PDFs</h1>
-      {!isLoading && showUploader && (
-        <FileUploader onFilesSelected={handleFilesSelected} />
+      
+      {files.length === 0 ? (
+        // Initial upload - show full FileUploader
+        !isLoading && showUploader && (
+          <FileUploader 
+            onFilesSelected={handleFilesSelected} 
+            multiple 
+          />
+        )
+      ) : (
+        // Files already added - show compact add more section
+        <div className="w-full max-w-md text-center mb-4">
+          <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
+            Drag & drop more PDFs anywhere on this page to add them
+          </p>
+          <Button
+            onClick={() => document.querySelector('input[type="file"]')?.click()}
+            variant="secondary"
+            size="sm"
+            className="text-sm"
+          >
+            📁 Browse for more PDFs
+          </Button>
+          <input
+            type="file"
+            multiple
+            accept="application/pdf"
+            onChange={(e) => handleFilesSelected(Array.from(e.target.files))}
+            className="hidden"
+          />
+        </div>
       )}
       {isLoading && files.length === 0 && (
         <div className="mt-8">
@@ -76,25 +140,32 @@ function Merge() {
       )}
       {files.length > 0 && showGrid && (
         <>
-          <p className="mt-6 text-gray-700 dark:text-gray-300">Drag PDFs to reorder:</p>
-          <SortableThumbnailsGrid
-            items={files}
-            onOrderChange={handleOrderChange}
-            getThumb={item => item.thumbnail}
-            getId={item => item.id}
-            getFilename={item => item.name}
-          />
-          <Button
-            onClick={handleMerge}
-            disabled={isLoading}
-            variant="primary"
-            size="lg"
-            className="mt-8"
-          >
-            {isWorking ? 'Merging...' : 'Merge PDFs'}
-          </Button>
+          <div className="w-full max-w-4xl">
+            <SortableThumbnailsGrid
+              items={files}
+              onOrderChange={handleOrderChange}
+              getThumb={item => item.thumbnail}
+              getId={item => item.id}
+              getFilename={item => item.name}
+            />
+          </div>
+          
+          <div className="flex justify-center mt-8">
+            <Button
+              onClick={handleMerge}
+              disabled={isLoading || isWorking}
+              variant="primary"
+              size="lg"
+              className="shadow"
+            >
+              {isWorking ? 'Merging...' : 'Merge PDFs'}
+            </Button>
+          </div>
         </>
       )}
+      
+      {/* Toast Notifications */}
+      <ToastContainer />
     </div>
   );
 }
