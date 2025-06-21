@@ -2,7 +2,7 @@
 
 > **Privacy-First PDF Toolkit** - A complete in-browser PDF utility suite that keeps your documents secure
 
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Try_Now-blue?style=for-the-badge)](https://pdfolio.app)
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Try_Now-blue?style=for-the-badge)](https://pdfolio.onrender.com)
 
 [![React](https://img.shields.io/badge/React-18.3.1-blue.svg)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-6.3.3-green.svg)](https://vitejs.dev/)
@@ -47,7 +47,7 @@
 
 ```bash
 # Clone and install
-git clone https://github.com/yourusername/pdfolio.git
+git clone https://github.com/ravneet0628/pdfolio.git
 cd pdfolio
 npm install
 
