@@ -15,6 +15,7 @@ import Delete from './pages/Delete';
 import Duplicate from './pages/Duplicate';
 import PageNumbering from './pages/PageNumbering';
 import PageScaling from './pages/PageScaling';
+import MetadataEditor from './pages/MetadataEditor';
 import ScrollToTop from './components/ScrollToTop';
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
               <Route path="/duplicate" element={<Duplicate />} />
               <Route path="/page-numbering" element={<PageNumbering />} />
               <Route path="/page-scaling" element={<PageScaling />} />
+              <Route path="/metadata-editor" element={<MetadataEditor />} />
             </Routes>
           </main>
           <Footer />

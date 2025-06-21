@@ -1,4 +1,4 @@
-import { ArrowRightIcon, DocumentDuplicateIcon, ScissorsIcon, ArrowsRightLeftIcon, ArrowPathIcon, ArrowDownTrayIcon, TrashIcon, Squares2X2Icon, LockClosedIcon, PencilSquareIcon, PhotoIcon, HashtagIcon, EyeDropperIcon } from '@heroicons/react/24/outline';
+import { ArrowRightIcon, DocumentDuplicateIcon, ScissorsIcon, ArrowsRightLeftIcon, ArrowPathIcon, ArrowDownTrayIcon, TrashIcon, Squares2X2Icon, LockClosedIcon, PencilSquareIcon, PhotoIcon, HashtagIcon, EyeDropperIcon, TagIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -111,6 +111,15 @@ const actions = [
 		iconBg: 'bg-lime-50',
 		comingSoon: false,
 	},
+	{
+		title: 'Edit Metadata',
+		description: 'Edit document properties like title, author, and keywords.',
+		href: '/metadata-editor',
+		icon: TagIcon,
+		iconColor: 'text-purple-600',
+		iconBg: 'bg-purple-50',
+		comingSoon: false,
+	},
 	// Add more as needed
 ];
 
@@ -133,6 +142,7 @@ const categories = [
 			actions[7], // Compress PDF
 			actions[8], // Add Page Numbers
 			actions[11], // Page Scaling & Layout
+			actions[12], // Edit Metadata
 		],
 	},
 	{
