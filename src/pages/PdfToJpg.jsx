@@ -119,7 +119,7 @@ function PdfToJpg() {
 
   return (
     <div className="flex flex-col items-center p-6 min-h-screen bg-white dark:bg-gray-900 transition-colors">
-      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">PDF to JPG</h1>
+      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100 text-center">PDF to JPG</h1>
       {showUploader && (
         <FileUploader onFilesSelected={handleFilesSelected} />
       )}

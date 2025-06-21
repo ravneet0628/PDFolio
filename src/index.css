@@ -13,3 +13,48 @@
   appearance: textfield;
 }
 
+/* Custom slider styles */
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%; 
+  background: #3b82f6;
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Mobile slider improvements */
+@media (max-width: 640px) {
+  .slider::-webkit-slider-thumb {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .slider::-moz-range-thumb {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.dark .slider::-webkit-slider-thumb {
+  background: #60a5fa;
+  border: 2px solid #1f2937;
+}
+
+.dark .slider::-moz-range-thumb {
+  background: #60a5fa;
+  border: 2px solid #1f2937;
+}
+

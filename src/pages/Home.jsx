@@ -1,4 +1,4 @@
-import { ArrowRightIcon, DocumentDuplicateIcon, ScissorsIcon, ArrowsRightLeftIcon, ArrowPathIcon, ArrowDownTrayIcon, TrashIcon, Squares2X2Icon, LockClosedIcon, PencilSquareIcon, PhotoIcon, HashtagIcon, EyeDropperIcon, TagIcon } from '@heroicons/react/24/outline';
+import { ArrowRightIcon, DocumentDuplicateIcon, ScissorsIcon, ArrowsRightLeftIcon, ArrowPathIcon, ArrowDownTrayIcon, TrashIcon, Squares2X2Icon, LockClosedIcon, PencilSquareIcon, PhotoIcon, HashtagIcon, EyeDropperIcon, TagIcon, DocumentMagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -120,6 +120,15 @@ const actions = [
 		iconBg: 'bg-purple-50',
 		comingSoon: false,
 	},
+	{
+		title: 'Remove Blank Pages',
+		description: 'Automatically detect and remove blank pages from PDFs.',
+		href: '/blank-page-remover',
+		icon: DocumentMagnifyingGlassIcon,
+		iconColor: 'text-orange-600',
+		iconBg: 'bg-orange-50',
+		comingSoon: false,
+	},
 	// Add more as needed
 ];
 
@@ -143,6 +152,7 @@ const categories = [
 			actions[8], // Add Page Numbers
 			actions[11], // Page Scaling & Layout
 			actions[12], // Edit Metadata
+			actions[13], // Remove Blank Pages
 		],
 	},
 	{
