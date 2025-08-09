@@ -1,13 +1,22 @@
-import { ArrowRightIcon, DocumentDuplicateIcon, ScissorsIcon, ArrowsRightLeftIcon, ArrowPathIcon, ArrowDownTrayIcon, TrashIcon, Squares2X2Icon, LockClosedIcon, PencilSquareIcon, PhotoIcon, HashtagIcon, EyeDropperIcon, TagIcon, DocumentMagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { ArrowRightIcon, ArrowsPointingInIcon, DocumentDuplicateIcon, Square3Stack3DIcon, StarIcon, ScissorsIcon, ArrowsRightLeftIcon, ArrowPathIcon, ArrowDownTrayIcon, TrashIcon, Squares2X2Icon, PhotoIcon, HashtagIcon,TagIcon, DocumentMagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const actions = [
+    {
+        title: 'Multi Tool',
+        description: 'Reorder, rotate, delete, and extract in one place.',
+        href: '/multi',
+        icon: StarIcon,
+        iconColor: 'text-cyan-600',
+        iconBg: 'bg-cyan-50',
+        comingSoon: false,
+    },
 	{
 		title: 'Merge PDFs',
 		description: 'Combine multiple PDF files into one.',
 		href: '/merge',
-		icon: DocumentDuplicateIcon,
+		icon: Square3Stack3DIcon,
 		iconColor: 'text-blue-600',
 		iconBg: 'bg-blue-50',
 		comingSoon: false,
@@ -70,7 +79,7 @@ const actions = [
 		title: 'Compress PDF',
 		description: 'Reduce the file size of your PDF.',
 		href: '/compress',
-		icon: Squares2X2Icon,
+		icon: ArrowsPointingInIcon,
 		iconColor: 'text-indigo-600',
 		iconBg: 'bg-indigo-50',
 		comingSoon: false,
@@ -134,25 +143,25 @@ const actions = [
 
 const categories = [
 	{
-		name: 'File Management',
+        name: 'Editing',
 		actions: [
-			actions[0], // Merge PDFs
-			actions[1], // Split PDFs
-			actions[2], // Reorder Pages
-			actions[3], // Extract Pages
-			actions[4], // Rotate Pages
-			actions[5], // Delete Pages
-			actions[6], // Duplicate Pages
+            actions[0], // Multi Tool
+            actions[2], // Reorder Pages
+            actions[3], // Extract Pages
+            actions[4], // Rotate Pages
+            actions[5], // Delete Pages
+            actions[6], // Duplicate Pages
 		],
 	},
 	{
-		name: 'Tools',
+        name: 'File Management',
 		actions: [
-			actions[7], // Compress PDF
-			actions[8], // Add Page Numbers
-			actions[11], // Page Scaling & Layout
-			actions[12], // Edit Metadata
-			actions[13], // Remove Blank Pages
+            actions[1], // Split PDFs
+            actions[7], // Compress PDF
+            actions[8], // Add Page Numbers
+            actions[11], // Page Scaling & Layout
+            actions[12], // Edit Metadata
+            actions[13], // Remove Blank Pages
 		],
 	},
 	{

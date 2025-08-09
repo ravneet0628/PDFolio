@@ -24,6 +24,7 @@
 ## 🛠️ **Available Tools**
 
 ### Core Operations
+- **Multi Tool** – Reorder, rotate, delete, and extract pages in one session; export when ready
 - **Merge PDFs** - Combine multiple PDFs with drag-and-drop reordering
 - **Split PDF** - Split PDFs into multiple files or extract page ranges
 - **Rotate Pages** - Rotate individual pages or entire documents

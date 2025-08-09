@@ -18,6 +18,7 @@ import PageScaling from './pages/PageScaling';
 import MetadataEditor from './pages/MetadataEditor';
 import BlankPageRemover from './pages/BlankPageRemover';
 import ScrollToTop from './components/ScrollToTop';
+import Multi from './pages/Multi';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
               <Route path="/split" element={<Split />} />
               <Route path="/rotate" element={<Rotate />} />
               <Route path="/reorder" element={<Reorder />} />
+              <Route path="/multi" element={<Multi />} />
               <Route path="/extract" element={<Extract />} />
               <Route path="/compress" element={<Compress />} />
               <Route path="/pdf-to-jpg" element={<PdfToJpg />} />

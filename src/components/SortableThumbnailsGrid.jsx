@@ -4,7 +4,7 @@ import { SortableContext, useSortable, arrayMove, rectSortingStrategy } from '@d
 import { CSS } from '@dnd-kit/utilities';
 import ThumbnailsGrid from './ThumbnailsGrid';
 
-function SortableThumbItem({ id, thumb, pageNum, filename, onDelete, renderFooter }) {
+function SortableThumbItem({ id, thumb, pageNum, filename, onDelete, renderFooter, rotation = 0, selected = false, onClick }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -23,12 +23,14 @@ function SortableThumbItem({ id, thumb, pageNum, filename, onDelete, renderFoote
       style={style} 
       {...attributes} 
       {...listeners}
+      onClick={onClick}
       className={`relative border-4 rounded-lg shadow-lg overflow-hidden transition bg-gray-200/50 dark:bg-gray-800 
-        border-transparent hover:border-gray-400 dark:hover:border-gray-400 hover:shadow-lg dark:hover:shadow-gray-700
+        ${selected ? 'border-cyan-700 dark:border-cyan-400 shadow-cyan-200 dark:shadow-cyan-800' : 'border-transparent hover:border-gray-400 dark:hover:border-gray-400 hover:shadow-lg dark:hover:shadow-gray-700'}
         touch-none select-none ${isDragging ? 'border-blue-400 dark:border-blue-500' : ''}`}>
       <div className="w-32 h-32 flex items-center justify-center bg-white dark:bg-gray-800 rounded-lg mx-auto relative">
         <img src={thumb} alt={filename || `Page ${pageNum}`}
-          className="max-w-full max-h-full transition-transform duration-300" />
+          className="max-w-full max-h-full transition-transform duration-300"
+          style={{ transform: `rotate(${rotation || 0}deg)` }} />
         
         {/* Drag handle indicator */}
         <div className="absolute top-1 left-1 opacity-30 hover:opacity-60 transition-opacity">
@@ -65,6 +67,9 @@ export default function SortableThumbnailsGrid({
   getId = (item) => item.id,
   getPageNum = (item) => item.pageNum,
   getFilename = (item) => item.name,
+  getRotation = (item) => item.rotation || 0,
+  selectedIds = [],
+  onItemClick,
   gridClass = '',
 }) {
   const sensors = useSensors(
@@ -84,6 +89,7 @@ export default function SortableThumbnailsGrid({
 
   const handleDragEnd = (event) => {
     const { active, over } = event;
+    if (!over) return;
     if (active.id !== over.id) {
       const oldIndex = ids.indexOf(active.id);
       const newIndex = ids.indexOf(over.id);
@@ -104,6 +110,9 @@ export default function SortableThumbnailsGrid({
               filename={getFilename(item)}
               onDelete={onDelete}
               renderFooter={renderFooter}
+              rotation={getRotation(item)}
+              selected={selectedIds.includes(getId(item))}
+              onClick={onItemClick ? (e) => { e.stopPropagation(); onItemClick(getId(item), item); } : undefined}
             />
           ))}
         </div>
