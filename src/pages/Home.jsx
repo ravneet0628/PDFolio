@@ -1,176 +1,196 @@
-import { ArrowRightIcon, ArrowsPointingInIcon, DocumentDuplicateIcon, Square3Stack3DIcon, StarIcon, ScissorsIcon, ArrowsRightLeftIcon, ArrowPathIcon, ArrowDownTrayIcon, TrashIcon, Squares2X2Icon, PhotoIcon, HashtagIcon,TagIcon, DocumentMagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import {
+  ArrowRightIcon,
+  ArrowsPointingInIcon,
+  DocumentDuplicateIcon,
+  Square3Stack3DIcon,
+  StarIcon,
+  ScissorsIcon,
+  ArrowsRightLeftIcon,
+  ArrowPathIcon,
+  ArrowDownTrayIcon,
+  TrashIcon,
+  Squares2X2Icon,
+  PhotoIcon,
+  HashtagIcon,
+  TagIcon,
+  DocumentMagnifyingGlassIcon,
+  PencilIcon,
+} from '@heroicons/react/24/outline';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const actions = [
-    {
-        title: 'Multi Tool',
-        description: 'Reorder, rotate, delete, and extract in one place.',
-        href: '/multi',
-        icon: StarIcon,
-        iconColor: 'text-cyan-600',
-        iconBg: 'bg-cyan-50',
-        comingSoon: false,
-    },
-	{
-		title: 'Merge PDFs',
-		description: 'Combine multiple PDF files into one.',
-		href: '/merge',
-		icon: Square3Stack3DIcon,
-		iconColor: 'text-blue-600',
-		iconBg: 'bg-blue-50',
-		comingSoon: false,
-	},
-	{
-		title: 'Split PDFs',
-		description: 'Split a PDF into multiple smaller files.',
-		href: '/split',
-		icon: ScissorsIcon,
-		iconColor: 'text-green-600',
-		iconBg: 'bg-green-50',
-		comingSoon: false,
-	},
-	{
-		title: 'Reorder Pages',
-		description: 'Drag and drop to rearrange PDF pages.',
-		href: '/reorder',
-		icon: ArrowsRightLeftIcon,
-		iconColor: 'text-purple-600',
-		iconBg: 'bg-purple-50',
-		comingSoon: false,
-	},
-	{
-		title: 'Extract Pages',
-		description: 'Extract specific pages from a PDF.',
-		href: '/extract',
-		icon: ArrowDownTrayIcon,
-		iconColor: 'text-pink-600',
-		iconBg: 'bg-pink-50',
-		comingSoon: false,
-	},
-	{
-		title: 'Rotate Pages',
-		description: 'Rotate one or more pages in your PDF.',
-		href: '/rotate',
-		icon: ArrowPathIcon,
-		iconColor: 'text-yellow-600',
-		iconBg: 'bg-yellow-50',
-		comingSoon: false,
-	},
-	{
-		title: 'Delete Pages',
-		description: 'Remove unwanted pages from your PDF.',
-		href: '/delete',
-		icon: TrashIcon,
-		iconColor: 'text-red-600',
-		iconBg: 'bg-red-50',
-		comingSoon: false,
-	},
-	{
-		title: 'Duplicate Pages',
-		description: 'Copy and insert pages within your PDF.',
-		href: '/duplicate',
-		icon: DocumentDuplicateIcon,
-		iconColor: 'text-cyan-600',
-		iconBg: 'bg-cyan-50',
-		comingSoon: false,
-	},
-	{
-		title: 'Compress PDF',
-		description: 'Reduce the file size of your PDF.',
-		href: '/compress',
-		icon: ArrowsPointingInIcon,
-		iconColor: 'text-indigo-600',
-		iconBg: 'bg-indigo-50',
-		comingSoon: false,
-	},
-	{
-		title: 'Add Page Numbers',
-		description: 'Insert page numbers with custom style.',
-		href: '/page-numbering',
-		icon: HashtagIcon,
-		iconColor: 'text-sky-600',
-		iconBg: 'bg-sky-50',
-		comingSoon: false,
-	},
-	{
-		title: 'PDF to JPG',
-		description: 'Convert PDF pages to high-quality images.',
-		href: '/pdf-to-jpg',
-		icon: PhotoIcon,
-		iconColor: 'text-orange-600',
-		iconBg: 'bg-orange-50',
-		comingSoon: false,
-	},
-	{
-		title: 'JPG to PDF',
-		description: 'Combine images into a single PDF.',
-		href: '/jpg-to-pdf',
-		icon: PhotoIcon,
-		iconColor: 'text-fuchsia-600',
-		iconBg: 'bg-fuchsia-50',
-		comingSoon: false,
-	},
-	{
-		title: 'Page Scaling & Layout',
-		description: 'Scale pages or arrange multiple per sheet (n-up).',
-		href: '/page-scaling',
-		icon: Squares2X2Icon,
-		iconColor: 'text-lime-600',
-		iconBg: 'bg-lime-50',
-		comingSoon: false,
-	},
-	{
-		title: 'Edit Metadata',
-		description: 'Edit document properties like title, author, and keywords.',
-		href: '/metadata-editor',
-		icon: TagIcon,
-		iconColor: 'text-purple-600',
-		iconBg: 'bg-purple-50',
-		comingSoon: false,
-	},
-	{
-		title: 'Remove Blank Pages',
-		description: 'Automatically detect and remove blank pages from PDFs.',
-		href: '/blank-page-remover',
-		icon: DocumentMagnifyingGlassIcon,
-		iconColor: 'text-orange-600',
-		iconBg: 'bg-orange-50',
-		comingSoon: false,
-	},
-	// Add more as needed
+const CATEGORY_ORDER = [
+  'Editing',
+  'File Management',
+  'Conversion',
 ];
 
-const categories = [
-	{
-        name: 'Editing',
-		actions: [
-            actions[0], // Multi Tool
-            actions[2], // Reorder Pages
-            actions[3], // Extract Pages
-            actions[4], // Rotate Pages
-            actions[5], // Delete Pages
-            actions[6], // Duplicate Pages
-		],
-	},
-	{
-        name: 'File Management',
-		actions: [
-            actions[1], // Split PDFs
-            actions[7], // Compress PDF
-            actions[8], // Add Page Numbers
-            actions[11], // Page Scaling & Layout
-            actions[12], // Edit Metadata
-            actions[13], // Remove Blank Pages
-		],
-	},
-	{
-		name: 'Conversion',
-		actions: [
-			actions[9], // PDF to JPG
-			actions[10], // JPG to PDF
-		],
-	},
+const tools = [
+  {
+    title: 'Multi Tool',
+    description:
+      'Reorder, rotate, delete, and extract in one place.',
+    href: '/multi',
+    icon: StarIcon,
+    iconColor: 'text-cyan-600',
+    iconBg: 'bg-cyan-50',
+    comingSoon: false,
+    category: 'Editing',
+  },
+  {
+    title: 'Merge PDFs',
+    description: 'Combine multiple PDF files into one.',
+    href: '/merge',
+    icon: Square3Stack3DIcon,
+    iconColor: 'text-blue-600',
+    iconBg: 'bg-blue-50',
+    comingSoon: false,
+    category: 'Editing',
+  },
+  {
+    title: 'Split PDFs',
+    description: 'Split a PDF into multiple smaller files.',
+    href: '/split',
+    icon: ScissorsIcon,
+    iconColor: 'text-green-600',
+    iconBg: 'bg-green-50',
+    comingSoon: false,
+    category: 'Editing',
+  },
+  {
+    title: 'Reorder Pages',
+    description: 'Drag and drop to rearrange PDF pages.',
+    href: '/reorder',
+    icon: ArrowsRightLeftIcon,
+    iconColor: 'text-purple-600',
+    iconBg: 'bg-purple-50',
+    comingSoon: false,
+    category: 'Editing',
+  },
+  {
+    title: 'Extract Pages',
+    description: 'Extract specific pages from a PDF.',
+    href: '/extract',
+    icon: ArrowDownTrayIcon,
+    iconColor: 'text-pink-600',
+    iconBg: 'bg-pink-50',
+    comingSoon: false,
+    category: 'Editing',
+  },
+  {
+    title: 'Rotate Pages',
+    description: 'Rotate one or more pages in your PDF.',
+    href: '/rotate',
+    icon: ArrowPathIcon,
+    iconColor: 'text-yellow-600',
+    iconBg: 'bg-yellow-50',
+    comingSoon: false,
+    category: 'Editing',
+  },
+  {
+    title: 'Delete Pages',
+    description: 'Remove unwanted pages from your PDF.',
+    href: '/delete',
+    icon: TrashIcon,
+    iconColor: 'text-red-600',
+    iconBg: 'bg-red-50',
+    comingSoon: false,
+    category: 'Editing',
+  },
+  {
+    title: 'Duplicate Pages',
+    description: 'Copy and insert pages within your PDF.',
+    href: '/duplicate',
+    icon: DocumentDuplicateIcon,
+    iconColor: 'text-cyan-600',
+    iconBg: 'bg-cyan-50',
+    comingSoon: false,
+    category: 'Editing',
+  },
+  {
+    title: 'Compress PDF',
+    description: 'Reduce the file size of your PDF.',
+    href: '/compress',
+    icon: ArrowsPointingInIcon,
+    iconColor: 'text-indigo-600',
+    iconBg: 'bg-indigo-50',
+    comingSoon: false,
+    category: 'File Management',
+  },
+  {
+    title: 'Add Page Numbers',
+    description: 'Insert page numbers with custom style.',
+    href: '/page-numbering',
+    icon: HashtagIcon,
+    iconColor: 'text-sky-600',
+    iconBg: 'bg-sky-50',
+    comingSoon: false,
+    category: 'File Management',
+  },
+  {
+    title: 'Page Scaling & Layout',
+    description:
+      'Scale pages or arrange multiple per sheet (n-up).',
+    href: '/page-scaling',
+    icon: Squares2X2Icon,
+    iconColor: 'text-lime-600',
+    iconBg: 'bg-lime-50',
+    comingSoon: false,
+    category: 'File Management',
+  },
+  {
+    title: 'Edit Metadata',
+    description:
+      'Edit document properties like title, author, and keywords.',
+    href: '/metadata-editor',
+    icon: TagIcon,
+    iconColor: 'text-purple-600',
+    iconBg: 'bg-purple-50',
+    comingSoon: false,
+    category: 'File Management',
+  },
+  {
+    title: 'Remove Blank Pages',
+    description:
+      'Automatically detect and remove blank pages from PDFs.',
+    href: '/blank-page-remover',
+    icon: DocumentMagnifyingGlassIcon,
+    iconColor: 'text-orange-600',
+    iconBg: 'bg-orange-50',
+    comingSoon: false,
+    category: 'File Management',
+  },
+  {
+    title: 'PDF to JPG',
+    description:
+      'Convert PDF pages to high-quality images.',
+    href: '/pdf-to-jpg',
+    icon: PhotoIcon,
+    iconColor: 'text-orange-600',
+    iconBg: 'bg-orange-50',
+    comingSoon: false,
+    category: 'Conversion',
+  },
+  {
+    title: 'JPG to PDF',
+    description: 'Combine images into a single PDF.',
+    href: '/jpg-to-pdf',
+    icon: PhotoIcon,
+    iconColor: 'text-fuchsia-600',
+    iconBg: 'bg-fuchsia-50',
+    comingSoon: false,
+    category: 'Conversion',
+  },
+  {
+    title: 'Form Fill',
+    description: 'Fill out forms with ease.',
+    href: '/form-fill',
+    icon: PencilIcon,
+    iconColor: 'text-purple-600',
+    iconBg: 'bg-purple-50',
+    comingSoon: false,
+    category: 'Editing',
+  },
 ];
 
 function Card({ className, children }) {
@@ -183,18 +203,40 @@ function Card({ className, children }) {
 	);
 }
 
+function groupToolsByCategory(filteredTools) {
+  const grouped = CATEGORY_ORDER.map((name) => ({
+    name,
+    actions: [],
+  }));
+
+  for (const tool of filteredTools) {
+    const idx = CATEGORY_ORDER.indexOf(tool.category);
+    if (idx !== -1) {
+      grouped[idx].actions.push(tool);
+    } else {
+      // If a tool has an unknown category, append a new group.
+      let other = grouped.find((g) => g.name === tool.category);
+      if (!other) {
+        other = { name: tool.category, actions: [] };
+        grouped.push(other);
+      }
+      other.actions.push(tool);
+    }
+  }
+
+  return grouped.filter((g) => g.actions.length > 0);
+}
+
 function Home() {
-	const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
-	// Filter actions by search
-	const filteredCategories = categories
-		.map((category) => ({
-			...category,
-			actions: category.actions.filter((action) => action.title.toLowerCase().includes(searchQuery.toLowerCase())),
-		}))
-		.filter((category) => category.actions.length > 0);
+  const filteredTools = tools.filter((t) =>
+    t.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-	return (
+  const filteredCategories = groupToolsByCategory(filteredTools);
+
+  return (
 		<div className="p-6 md:p-12 bg-gray-50 dark:bg-gray-950 min-h-screen transition-colors">
 			<div className="text-center mb-10">
 				<h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-gray-100">
@@ -221,7 +263,7 @@ function Home() {
 					No tools found matching "<span className="italic">{searchQuery}</span>"
 				</div>
 			) : (
-				filteredCategories.map((category, idx) => (
+                filteredCategories.map((category) => (
 					<div key={category.name} className="mb-12">
 						<h2 className="text-xl font-semibold mb-4 pl-2 text-gray-900 dark:text-gray-100">{category.name}</h2>
 						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
